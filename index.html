@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracle SQL Cute Flashcards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            --card-bg: #ffffff;
+            --text-dark: #4a4a4a;
+            --text-accent: #ff6b6b;
+            --btn-bg: #4ecdc4;
+            --btn-hover: #45b7b0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 350px;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy flip */
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 25px; /* Super rounded */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            background: var(--card-bg);
+            text-align: center;
+        }
+
+        .card-front {
+            color: var(--text-accent);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .card-front::before {
+            content: "❓";
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .card-back::before {
+            content: "💡";
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 6px;
+            color: #d63031;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        button {
+            background-color: var(--btn-bg);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 0 var(--btn-hover);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--btn-hover);
+        }
+
+        button:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 var(--btn-hover);
+        }
+
+        .tap-hint {
+            margin-top: 20px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hud">
+        <div id="topic-display">📂 Topic Here</div>
+        <div id="progress-display">📝 1 / 25</div>
+    </div>
+    
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="card">
+            <div class="card-face card-front" id="card-front">Question goes here...</div>
+            <div class="card-face card-back" id="card-back">Answer goes here...</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prevCard()">⬅️ Back</button>
+        <button onclick="nextCard()">Next ➡️</button>
+    </div>
+    
+    <div class="tap-hint">👆 TAP CARD TO FLIP</div>
+</div>
+
+<script>
+    const flashcards = [
+        // Topic 1: Architecture
+        { topic: "1. DB Architecture", q: "What is the difference between Logical and Physical storage?", a: "Logical = How we view data (Tables/Columns).<br><br>Physical = How the OS stores it (Datafiles/Blocks)." },
+        { topic: "1. DB Architecture", q: "What is the core goal of the Relational Model?", a: "Data Independence! You can query a table without knowing where it physically lives on the disk." },
+        
+        // Topic 2: Retrieval & Sorting
+        { topic: "2. Retrieval & Sorting", q: "What is the strict SQL Execution Order?", a: "1. FROM<br>2. WHERE<br>3. GROUP BY<br>4. HAVING<br>5. SELECT<br>6. ORDER BY" },
+        { topic: "2. Retrieval & Sorting", q: "How do you use q-quotes?", a: "To safely print strings with apostrophes without breaking code.<br><br>Example: <code>q'[It's a test]'</code>" },
+        { topic: "2. Retrieval & Sorting", q: "What is the result of ANY arithmetic operation involving a NULL value?", a: "Always NULL." },
+        { topic: "2. Retrieval & Sorting", q: "What is the default ORDER BY behavior for NULLs?", a: "ASC places NULLs LAST.<br><br>DESC places NULLs FIRST." },
+        { topic: "2. Retrieval & Sorting", q: "When do you use Double Quotes vs Single Quotes?", a: "Double Quotes <code>\" \"</code> for column aliases.<br><br>Single Quotes <code>' '</code> for literal text strings." },
+        { topic: "2. Retrieval & Sorting", q: "What is the difference between & and && substitution variables?", a: "<code>&</code> prompts the user every time.<br><br><code>&&</code> prompts once and stores the value for the session." },
+        { topic: "2. Retrieval & Sorting", q: "What does the DEFINE command do?", a: "Hardcodes a substitution variable at the top of a script WITHOUT prompting the user." },
+        { topic: "2. Retrieval & Sorting", q: "What does SET VERIFY ON do?", a: "Forces the client to print the 'old' and 'new' script lines when substitution variables are executed." },
+        
+        // Topic 3: Functions & Aggregation
+        { topic: "3. Functions & Aggregation", q: "What does TRUNC(SYSDATE, 'YEAR') return?", a: "January 1st of the current year." },
+        { topic: "3. Functions & Aggregation", q: "What is a highly tested use case for the MOD function?", a: "Finding even/odd numbers!<br><br><code>MOD(salary, 2) = 0</code> means it is even." },
+        { topic: "3. Functions & Aggregation", q: "What is the strict rule for NVL data types?", a: "Both arguments inside <code>NVL(arg1, arg2)</code> MUST be the exact same data type." },
+        { topic: "3. Functions & Aggregation", q: "How does COALESCE differ from NVL?", a: "NVL takes exactly two arguments.<br><br>COALESCE takes unlimited arguments and returns the FIRST non-null value." },
+        { topic: "3. Functions & Aggregation", q: "What does NULLIF(a, b) return if the values match?", a: "It returns NULL! (If they differ, it returns 'a')." },
+        { topic: "3. Functions & Aggregation", q: "Which group function does NOT ignore NULL values?", a: "<code>COUNT(*)</code> counts all rows, including NULLs." },
+        { topic: "3. Functions & Aggregation", q: "What is the strict rule connecting SELECT and GROUP BY?", a: "If a column in your SELECT list is NOT inside an aggregate function, it MUST be listed in your GROUP BY clause." },
+        { topic: "3. Functions & Aggregation", q: "What is the difference between WHERE and HAVING?", a: "WHERE filters rows BEFORE grouping.<br><br>HAVING filters groups AFTER aggregation." },
+        { topic: "3. Functions & Aggregation", q: "What major GROUP BY upgrade was introduced in Oracle 23ai?", a: "You can now use column aliases inside the GROUP BY and HAVING clauses!" },
+        
+        // Topic 4: Joins
+        { topic: "4. Joins", q: "What causes an ORA-00918 (Ambiguous Column) error?", a: "Joining tables with a shared column name without using a table alias prefix." },
+        { topic: "4. Joins", q: "What is the strict rule when using the ANSI USING clause?", a: "You are forbidden from putting a table prefix (like <code>e.dept_id</code>) anywhere in the query for the join column." },
+        { topic: "4. Joins", q: "Where does the Oracle (+) operator go in an outer join?", a: "Always on the DEFICIENT side (the table missing the data)." },
+        { topic: "4. Joins", q: "Why will the query FROM employees SELF JOIN employees fail?", a: "SELF JOIN is not a real keyword! You must use standard JOIN and assign different table aliases." },
+        { topic: "4. Joins", q: "Why can't you use the USING clause in a Non-Equijoin?", a: "Because there are no exactly matching column names. You MUST use the ON clause." },
+        { topic: "4. Joins", q: "What causes a Cartesian Product?", a: "Accidentally omitting a join condition or WHERE clause, causing rows to multiply (Table A × Table B)." }
+    ];
+
+    let currentIndex = 0;
+    const cardEl = document.getElementById('card');
+    const frontEl = document.getElementById('card-front');
+    const backEl = document.getElementById('card-back');
+    const topicEl = document.getElementById('topic-display');
+    const progressEl = document.getElementById('progress-display');
+
+    function updateCard() {
+        // Remove flip class to ensure we see the front when changing cards
+        cardEl.classList.remove('is-flipped');
+        
+        // Small delay to let the card flip back before changing text
+        setTimeout(() => {
+            const currentCard = flashcards[currentIndex];
+            frontEl.innerHTML = currentCard.q;
+            backEl.innerHTML = currentCard.a;
+            topicEl.innerHTML = `📂 ${currentCard.topic}`;
+            progressEl.innerHTML = `📝 ${currentIndex + 1} / ${flashcards.length}`;
+        }, 150); // Matches the start of the CSS transition
+    }
+
+    function flipCard() {
+        cardEl.classList.toggle('is-flipped');
+    }
+
+    function nextCard() {
+        currentIndex = (currentIndex + 1) % flashcards.length;
+        updateCard();
+    }
+
+    function prevCard() {
+        currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+        updateCard();
+    }
+
+    // Initialize the deck on load
+    updateCard();
+</script>
+</body>
+</html>
