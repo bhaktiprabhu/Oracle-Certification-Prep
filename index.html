@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oracle SQL Cute Flashcards</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
@@ -45,7 +46,7 @@
             font-weight: 800;
             font-size: 1.1rem;
             color: #fff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .card-container {
@@ -61,7 +62,8 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy flip */
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            /* Bouncy flip */
         }
 
         .card.is-flipped {
@@ -73,14 +75,15 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 25px; /* Super rounded */
+            border-radius: 25px;
+            /* Super rounded */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 30px;
             box-sizing: border-box;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
             background: var(--card-bg);
             text-align: center;
         }
@@ -160,102 +163,161 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <div class="hud">
-        <div id="topic-display">📂 Topic Here</div>
-        <div id="progress-display">📝 1 / 25</div>
-    </div>
-    
-    <div class="card-container" onclick="flipCard()">
-        <div class="card" id="card">
-            <div class="card-face card-front" id="card-front">Question goes here...</div>
-            <div class="card-face card-back" id="card-back">Answer goes here...</div>
+    <div class="container">
+        <div class="hud">
+            <div id="topic-display">📂 Topic Here</div>
+            <div id="progress-display">📝 1 / 25</div>
         </div>
+
+        <div class="card-container" onclick="flipCard()">
+            <div class="card" id="card">
+                <div class="card-face card-front" id="card-front">Question goes here...</div>
+                <div class="card-face card-back" id="card-back">Answer goes here...</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="prevCard()">⬅️ Back</button>
+            <button onclick="nextCard()">Next ➡️</button>
+        </div>
+
+        <div class="tap-hint">👆 TAP CARD TO FLIP</div>
     </div>
 
-    <div class="controls">
-        <button onclick="prevCard()">⬅️ Back</button>
-        <button onclick="nextCard()">Next ➡️</button>
-    </div>
-    
-    <div class="tap-hint">👆 TAP CARD TO FLIP</div>
-</div>
+    <script>
+        const flashcards = [
+            // Topic 1: Architecture
+            { topic: "1. DB Architecture", q: "What is the difference between Logical and Physical storage?", a: "Logical = How we view data (Tables/Columns).<br><br>Physical = How the OS stores it (Datafiles/Blocks)." },
+            { topic: "1. DB Architecture", q: "What is the core goal of the Relational Model?", a: "Data Independence! You can query a table without knowing where it physically lives on the disk." },
 
-<script>
-    const flashcards = [
-        // Topic 1: Architecture
-        { topic: "1. DB Architecture", q: "What is the difference between Logical and Physical storage?", a: "Logical = How we view data (Tables/Columns).<br><br>Physical = How the OS stores it (Datafiles/Blocks)." },
-        { topic: "1. DB Architecture", q: "What is the core goal of the Relational Model?", a: "Data Independence! You can query a table without knowing where it physically lives on the disk." },
-        
-        // Topic 2: Retrieval & Sorting
-        { topic: "2. Retrieval & Sorting", q: "What is the strict SQL Execution Order?", a: "1. FROM<br>2. WHERE<br>3. GROUP BY<br>4. HAVING<br>5. SELECT<br>6. ORDER BY" },
-        { topic: "2. Retrieval & Sorting", q: "How do you use q-quotes?", a: "To safely print strings with apostrophes without breaking code.<br><br>Example: <code>q'[It's a test]'</code>" },
-        { topic: "2. Retrieval & Sorting", q: "What is the result of ANY arithmetic operation involving a NULL value?", a: "Always NULL." },
-        { topic: "2. Retrieval & Sorting", q: "What is the default ORDER BY behavior for NULLs?", a: "ASC places NULLs LAST.<br><br>DESC places NULLs FIRST." },
-        { topic: "2. Retrieval & Sorting", q: "When do you use Double Quotes vs Single Quotes?", a: "Double Quotes <code>\" \"</code> for column aliases.<br><br>Single Quotes <code>' '</code> for literal text strings." },
-        { topic: "2. Retrieval & Sorting", q: "What is the difference between & and && substitution variables?", a: "<code>&</code> prompts the user every time.<br><br><code>&&</code> prompts once and stores the value for the session." },
-        { topic: "2. Retrieval & Sorting", q: "What does the DEFINE command do?", a: "Hardcodes a substitution variable at the top of a script WITHOUT prompting the user." },
-        { topic: "2. Retrieval & Sorting", q: "What does SET VERIFY ON do?", a: "Forces the client to print the 'old' and 'new' script lines when substitution variables are executed." },
-        
-        // Topic 3: Functions & Aggregation
-        { topic: "3. Functions & Aggregation", q: "What does TRUNC(SYSDATE, 'YEAR') return?", a: "January 1st of the current year." },
-        { topic: "3. Functions & Aggregation", q: "What is a highly tested use case for the MOD function?", a: "Finding even/odd numbers!<br><br><code>MOD(salary, 2) = 0</code> means it is even." },
-        { topic: "3. Functions & Aggregation", q: "What is the strict rule for NVL data types?", a: "Both arguments inside <code>NVL(arg1, arg2)</code> MUST be the exact same data type." },
-        { topic: "3. Functions & Aggregation", q: "How does COALESCE differ from NVL?", a: "NVL takes exactly two arguments.<br><br>COALESCE takes unlimited arguments and returns the FIRST non-null value." },
-        { topic: "3. Functions & Aggregation", q: "What does NULLIF(a, b) return if the values match?", a: "It returns NULL! (If they differ, it returns 'a')." },
-        { topic: "3. Functions & Aggregation", q: "Which group function does NOT ignore NULL values?", a: "<code>COUNT(*)</code> counts all rows, including NULLs." },
-        { topic: "3. Functions & Aggregation", q: "What is the strict rule connecting SELECT and GROUP BY?", a: "If a column in your SELECT list is NOT inside an aggregate function, it MUST be listed in your GROUP BY clause." },
-        { topic: "3. Functions & Aggregation", q: "What is the difference between WHERE and HAVING?", a: "WHERE filters rows BEFORE grouping.<br><br>HAVING filters groups AFTER aggregation." },
-        { topic: "3. Functions & Aggregation", q: "What major GROUP BY upgrade was introduced in Oracle 23ai?", a: "You can now use column aliases inside the GROUP BY and HAVING clauses!" },
-        
-        // Topic 4: Joins
-        { topic: "4. Joins", q: "What causes an ORA-00918 (Ambiguous Column) error?", a: "Joining tables with a shared column name without using a table alias prefix." },
-        { topic: "4. Joins", q: "What is the strict rule when using the ANSI USING clause?", a: "You are forbidden from putting a table prefix (like <code>e.dept_id</code>) anywhere in the query for the join column." },
-        { topic: "4. Joins", q: "Where does the Oracle (+) operator go in an outer join?", a: "Always on the DEFICIENT side (the table missing the data)." },
-        { topic: "4. Joins", q: "Why will the query FROM employees SELF JOIN employees fail?", a: "SELF JOIN is not a real keyword! You must use standard JOIN and assign different table aliases." },
-        { topic: "4. Joins", q: "Why can't you use the USING clause in a Non-Equijoin?", a: "Because there are no exactly matching column names. You MUST use the ON clause." },
-        { topic: "4. Joins", q: "What causes a Cartesian Product?", a: "Accidentally omitting a join condition or WHERE clause, causing rows to multiply (Table A × Table B)." }
-    ];
+            // Topic 2: Retrieval & Sorting
+            { topic: "2. Retrieval & Sorting", q: "What is the strict SQL Execution Order?", a: "1. FROM<br>2. WHERE<br>3. GROUP BY<br>4. HAVING<br>5. SELECT<br>6. ORDER BY" },
+            { topic: "2. Retrieval & Sorting", q: "How do you use q-quotes?", a: "To safely print strings with apostrophes without breaking code.<br><br>Example: <code>q'[It's a test]'</code>" },
+            { topic: "2. Retrieval & Sorting", q: "What is the result of ANY arithmetic operation involving a NULL value?", a: "Always NULL." },
+            { topic: "2. Retrieval & Sorting", q: "What is the default ORDER BY behavior for NULLs?", a: "ASC places NULLs LAST.<br><br>DESC places NULLs FIRST." },
+            { topic: "2. Retrieval & Sorting", q: "When do you use Double Quotes vs Single Quotes?", a: "Double Quotes <code>\" \"</code> for column aliases.<br><br>Single Quotes <code>' '</code> for literal text strings." },
+            { topic: "2. Retrieval & Sorting", q: "What is the difference between & and && substitution variables?", a: "<code>&</code> prompts the user every time.<br><br><code>&&</code> prompts once and stores the value for the session." },
+            { topic: "2. Retrieval & Sorting", q: "What does the DEFINE command do?", a: "Hardcodes a substitution variable at the top of a script WITHOUT prompting the user." },
+            { topic: "2. Retrieval & Sorting", q: "What does SET VERIFY ON do?", a: "Forces the client to print the 'old' and 'new' script lines when substitution variables are executed." },
 
-    let currentIndex = 0;
-    const cardEl = document.getElementById('card');
-    const frontEl = document.getElementById('card-front');
-    const backEl = document.getElementById('card-back');
-    const topicEl = document.getElementById('topic-display');
-    const progressEl = document.getElementById('progress-display');
+            // Topic 3: Functions & Aggregation
+            { topic: "3. Functions & Aggregation", q: "What does TRUNC(SYSDATE, 'YEAR') return?", a: "January 1st of the current year." },
+            { topic: "3. Functions & Aggregation", q: "What is a highly tested use case for the MOD function?", a: "Finding even/odd numbers!<br><br><code>MOD(salary, 2) = 0</code> means it is even." },
+            { topic: "3. Functions & Aggregation", q: "What is the strict rule for NVL data types?", a: "Both arguments inside <code>NVL(arg1, arg2)</code> MUST be the exact same data type." },
+            { topic: "3. Functions & Aggregation", q: "How does COALESCE differ from NVL?", a: "NVL takes exactly two arguments.<br><br>COALESCE takes unlimited arguments and returns the FIRST non-null value." },
+            { topic: "3. Functions & Aggregation", q: "What does NULLIF(a, b) return if the values match?", a: "It returns NULL! (If they differ, it returns 'a')." },
+            { topic: "3. Functions & Aggregation", q: "Which group function does NOT ignore NULL values?", a: "<code>COUNT(*)</code> counts all rows, including NULLs." },
+            { topic: "3. Functions & Aggregation", q: "What is the strict rule connecting SELECT and GROUP BY?", a: "If a column in your SELECT list is NOT inside an aggregate function, it MUST be listed in your GROUP BY clause." },
+            { topic: "3. Functions & Aggregation", q: "What is the difference between WHERE and HAVING?", a: "WHERE filters rows BEFORE grouping.<br><br>HAVING filters groups AFTER aggregation." },
+            { topic: "3. Functions & Aggregation", q: "What major GROUP BY upgrade was introduced in Oracle 23ai?", a: "You can now use column aliases inside the GROUP BY and HAVING clauses!" },
 
-    function updateCard() {
-        // Remove flip class to ensure we see the front when changing cards
-        cardEl.classList.remove('is-flipped');
-        
-        // Small delay to let the card flip back before changing text
-        setTimeout(() => {
-            const currentCard = flashcards[currentIndex];
-            frontEl.innerHTML = currentCard.q;
-            backEl.innerHTML = currentCard.a;
-            topicEl.innerHTML = `📂 ${currentCard.topic}`;
-            progressEl.innerHTML = `📝 ${currentIndex + 1} / ${flashcards.length}`;
-        }, 150); // Matches the start of the CSS transition
-    }
+            // Topic 4: Joins
+            { topic: "4. Joins", q: "What causes an ORA-00918 (Ambiguous Column) error?", a: "Joining tables with a shared column name without using a table alias prefix." },
+            { topic: "4. Joins", q: "What is the strict rule when using the ANSI USING clause?", a: "You are forbidden from putting a table prefix (like <code>e.dept_id</code>) anywhere in the query for the join column." },
+            { topic: "4. Joins", q: "Where does the Oracle (+) operator go in an outer join?", a: "Always on the DEFICIENT side (the table missing the data)." },
+            { topic: "4. Joins", q: "Why will the query FROM employees SELF JOIN employees fail?", a: "SELF JOIN is not a real keyword! You must use standard JOIN and assign different table aliases." },
+            { topic: "4. Joins", q: "Why can't you use the USING clause in a Non-Equijoin?", a: "Because there are no exactly matching column names. You MUST use the ON clause." },
+            { topic: "4. Joins", q: "What causes a Cartesian Product?", a: "Accidentally omitting a join condition or WHERE clause, causing rows to multiply (Table A × Table B)." },
 
-    function flipCard() {
-        cardEl.classList.toggle('is-flipped');
-    }
+            // Topic 5: Subqueries 
+            { f: "Subquery ORA-01427 Error", b: "Occurs when a single-row subquery using standard comparison operators (=, <, >) accidentally returns multiple rows." },
+            { f: "NOT IN and NULL Trap", b: "If a multiple-row subquery using NOT IN returns even a single NULL value, the outer query will return zero rows." },
+            { f: "= ANY Synonym", b: "The = ANY operator is mathematically identical to the IN operator." },
+            { f: "UPDATE SET Alias Trap", b: "Oracle strictly forbids prefixing the target column in the SET clause with a table alias (e.g., SET e.bonus = 100 will crash)." },
+            { f: "MERGE Statement", b: "A modern alternative to correlated subqueries for modifying data. It avoids row-by-row looping and allows aliases in the SET clause." },
+            { f: "Updatable Inline Views", b: "Oracle proprietary syntax that allows you to directly UPDATE the result of a SELECT statement joining two tables." },
 
-    function nextCard() {
-        currentIndex = (currentIndex + 1) % flashcards.length;
+            // Topic 6: Set Operators
+            { f: "Set Operators Rule: Columns", b: "The number of columns and their data types must match exactly across all queries being combined." },
+            { f: "Set Operators Rule: Names", b: "The column names in the final output are strictly determined by the first SELECT statement." },
+            { f: "UNION vs UNION ALL", b: "UNION removes duplicates and implicitly sorts. UNION ALL retains duplicates, skips sorting, and is much faster." },
+            { f: "MINUS Operator Synonym", b: "MINUS is Oracle proprietary. The ANSI standard equivalent is EXCEPT." },
+            { f: "Dummy Columns", b: "Used to balance the column count in Set Operators. Example: SELECT name, age FROM A MINUS SELECT name, NULL FROM B." },
+            { f: "Set Operators ORDER BY Rule", b: "You can only use one ORDER BY clause, it must be at the very end of the statement, and it must reference the first query's columns." },
+            { f: "Implicit Sort Trap", b: "While UNION implicitly sorts data to remove duplicates, you must still use an explicit ORDER BY if the output strictly requires sorting." },
+
+            // Topic 7: DML statements
+            { f: "Explicit vs Implicit INSERT", b: "Explicit lists the columns (safest). Implicit skips the columns but strictly requires every value in the exact order of table creation." },
+            { f: "The DEFAULT Keyword", b: "In an INSERT statement, you can literally type the word DEFAULT in the VALUES list to trigger the column's default value." },
+            { f: "Implicit Commit Triggers", b: "Running any DDL (CREATE, ALTER, DROP) or DCL (GRANT, REVOKE) statement automatically and permanently commits any pending DML transactions." },
+            { f: "Read Consistency", b: "Before a COMMIT, only you can see your DML changes. Other users querying the database will see the original, unchanged data." },
+            { f: "UNIQUE vs NULL", b: "A UNIQUE constraint allows multiple NULL values because Oracle considers 'unknown' values to be mathematically distinct from each other." },
+            { f: "PRIMARY KEY Rule", b: "A Primary Key is the combination of NOT NULL + UNIQUE. A table can only have exactly ONE Primary Key." },
+            { f: "Constraint Naming Best Practice", b: "Always explicitly name constraints (e.g., emp_id_pk) so error messages are readable. Otherwise, Oracle auto-generates a meaningless SYS_C### name." },
+
+            // Topic 8: DDL
+            { f: "VARCHAR2 vs CHAR", b: "VARCHAR2 is variable-length and only uses the space needed. CHAR is fixed-length and pads empty space with invisible blanks." },
+            { f: "Data Type Size Rules", b: "VARCHAR2 strictly requires a size (e.g., VARCHAR2(50)). If you omit the size for CHAR, it defaults to CHAR(1)." },
+            { f: "The Namespace Rule", b: "Tables and Views share the same namespace in Oracle. You cannot have a table and a view with the exact same name." },
+            { f: "NOT NULL Constraint Rule", b: "The NOT NULL constraint is the only constraint that MUST be defined at the column level. It cannot be defined at the table level." },
+            { f: "Composite Key Rule", b: "If a PRIMARY KEY or UNIQUE constraint requires multiple columns, it MUST be defined using the table-level syntax at the bottom of the CREATE statement." },
+            { f: "View vs Sequence", b: "A View is a logical window based on a SELECT query (stores no data). A Sequence is an independent object that auto-generates unique numbers." },
+            { f: "DROP COLUMN vs SET UNUSED", b: "DROP physically removes data and is slow on large tables. SET UNUSED logically hides the column instantly, avoiding database locks." },
+            { f: "TRUNCATE TABLE Rules", b: "It is a DDL statement, meaning it cannot be rolled back (implicit commit). It deletes all rows instantly and releases physical storage space. No WHERE clause allowed." },
+            { f: "Global Temporary Tables (GTT)", b: "The structure is permanent and visible to all, but the data is private to the session. Defaults to ON COMMIT DELETE ROWS." },
+            { f: "ON COMMIT PRESERVE ROWS", b: "Used in GTTs to keep the private data alive through commits. The data is only wiped when the user's session ends." },
+            { f: "External Tables Restrictions", b: "They are strictly read-only. You cannot run DML (INSERT, UPDATE, DELETE) or create indexes on them." },
+            { f: "ORGANIZATION EXTERNAL", b: "The mandatory clause in a CREATE TABLE statement that maps the table to an operating system flat file using an access driver like ORACLE_LOADER." },
+            { f: "WITH CHECK OPTION", b: "A view constraint that prevents users from running UPDATE or INSERT statements that would cause the row to violate the view's WHERE clause." },
+
+            // Topic 9: Managing Indexes, Synonyms, and Sequences
+            { f: "Synonym Purpose", b: "Provides an alternative name (alias) for a database object to simplify long names or hide the schema owner. It stores no data itself." },
+            { f: "Sequence CURRVAL Rule", b: "You MUST call NEXTVAL at least once in your current session before you are allowed to query CURRVAL, otherwise Oracle throws an error." },
+            { f: "Identity Column Strict Mode", b: "Defining a column as GENERATED ALWAYS AS IDENTITY forces the database to reject any manual inserts provided by a user for that column." },
+
+            // Topic 10: Controlling User Access
+            { f: "System vs Object Privileges", b: "System privileges grant database-wide powers (e.g., CREATE TABLE). Object privileges grant rights to specific targets and strictly require the ON keyword (e.g., SELECT ON hr.employees)." },
+            { f: "WITH GRANT OPTION vs WITH ADMIN OPTION", b: "WITH GRANT OPTION is for Object privileges (revokes cascade). WITH ADMIN OPTION is for System privileges (revokes do NOT cascade)." },
+            { f: "Roles 3-Step Process", b: "1) Create the role. 2) Grant system or object privileges to the role. 3) Grant the role to the users." },
+
+            // Topic 11: Data Dictionary & Time Zones
+            { f: "Data Dictionary Prefixes", b: "USER_ = Objects you own. ALL_ = Objects you have access to. DBA_ = Every object in the database (requires DBA privileges)." },
+            { f: "Time Zone: Session vs Server", b: "Functions prefixed with CURRENT_ or LOCAL return the session's time. Functions prefixed with SYS (like SYSDATE) return the database server's OS time." },
+            { f: "CURRENT_TIMESTAMP", b: "The specific time zone function that returns the session's date, fractional seconds, AND the explicit time zone offset (e.g., +02:00)." },
+            { f: "INTERVAL Data Types", b: "The two specific types used for date arithmetic are INTERVAL YEAR TO MONTH (e.g., '2-6') and INTERVAL DAY TO SECOND (e.g., '4 12:30:00')." }
+        ];
+
+        let currentIndex = 0;
+        const cardEl = document.getElementById('card');
+        const frontEl = document.getElementById('card-front');
+        const backEl = document.getElementById('card-back');
+        const topicEl = document.getElementById('topic-display');
+        const progressEl = document.getElementById('progress-display');
+
+        function updateCard() {
+            // Remove flip class to ensure we see the front when changing cards
+            cardEl.classList.remove('is-flipped');
+
+            // Small delay to let the card flip back before changing text
+            setTimeout(() => {
+                const currentCard = flashcards[currentIndex];
+                frontEl.innerHTML = currentCard.q;
+                backEl.innerHTML = currentCard.a;
+                topicEl.innerHTML = `📂 ${currentCard.topic}`;
+                progressEl.innerHTML = `📝 ${currentIndex + 1} / ${flashcards.length}`;
+            }, 150); // Matches the start of the CSS transition
+        }
+
+        function flipCard() {
+            cardEl.classList.toggle('is-flipped');
+        }
+
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % flashcards.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+            updateCard();
+        }
+
+        // Initialize the deck on load
         updateCard();
-    }
-
-    function prevCard() {
-        currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
-        updateCard();
-    }
-
-    // Initialize the deck on load
-    updateCard();
-</script>
+    </script>
 </body>
+
 </html>
