@@ -1,0 +1,415 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    --card-bg: #ffffff;
+    --text-dark: #4a4a4a;
+    --text-accent: #ff6b6b;
+    --btn-bg: #4ecdc4;
+    --btn-hover: #45b7b0;
+    --success: #2ecc71;
+    --success-hover: #27ae60;
+    --danger: #e74c3c;
+    --danger-hover: #c0392b;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* --- STREAMING_CHUNK: Styling the Left Quiz Section --- */
+.quiz-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 20px;
+    height: auto;
+}
+
+.header-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.topic-badge {
+    color: var(--text-accent);
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.timer {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    box-shadow: 0 4px 0 #e0e0e0;
+}
+
+.timer.warning {
+    color: var(--danger);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* --- STREAMING_CHUNK: Styling the Bouncy 3D Flashcard --- */
+.card-container {
+    perspective: 1000px;
+    width: 100%;
+    height: 320px;
+    /* FIXED HEIGHT for desktop */
+    margin-bottom: 15px;
+}
+
+.card {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    /* Keeps faces stacked */
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.card.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    /* Forces the face to respect the container height */
+    backface-visibility: hidden;
+    background: var(--card-bg);
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    /* Enables scrolling inside the card if text is too long */
+}
+
+.card-front {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-accent);
+    line-height: 1.5;
+}
+
+.card-front::before {
+    content: "❓";
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.6;
+    text-align: left;
+    align-items: flex-start;
+    padding: 20px 30px;
+    overflow-y: auto;
+}
+
+.card-back::before {
+    content: "💡";
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.card-back b {
+    color: var(--text-accent);
+    font-weight: 800;
+}
+
+.card-back pre {
+    background: #f4f4f4;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #d63031;
+    overflow-x: auto;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* --- STREAMING_CHUNK: Styling the Options and Buttons --- */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.option-btn {
+    background: var(--card-bg);
+    border: none;
+    padding: 18px 25px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    color: var(--text-dark);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 0 #e0e0e0;
+    line-height: 1.4;
+}
+
+.option-btn code {
+    background: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: #d63031;
+    font-family: monospace;
+}
+
+.option-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 #e0e0e0;
+}
+
+.option-btn:active:not(:disabled) {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #e0e0e0;
+}
+
+.option-btn.correct {
+    background: var(--success);
+    color: white;
+    box-shadow: 0 6px 0 var(--success-hover);
+}
+
+.option-btn.correct code {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.option-btn.wrong {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 6px 0 var(--danger-hover);
+}
+
+.option-btn.wrong code {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.option-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.action-btn {
+    padding: 15px 30px;
+    border-radius: 50px;
+    border: none;
+    background: var(--btn-bg);
+    color: white;
+    font-weight: 800;
+    font-size: 1.1rem;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 0 var(--btn-hover);
+    display: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 var(--btn-hover);
+}
+
+.action-btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 var(--btn-hover);
+}
+
+/* --- STREAMING_CHUNK: Styling the Glassmorphism Scoreboard --- */
+.score-section {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    height: fit-content;
+}
+
+.score-section h3 {
+    margin-top: 0;
+    color: var(--text-accent);
+    border-bottom: 2px dashed rgba(0, 0, 0, 0.1);
+    padding-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    text-align: center;
+}
+
+.topic-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.topic-score:last-child {
+    border-bottom: none;
+}
+
+.topic-name {
+    flex: 1;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+.score-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    min-width: 30px;
+    text-align: center;
+}
+
+.badge-correct {
+    background: #e8f8f5;
+    color: var(--success);
+}
+
+.badge-wrong {
+    background: #fdf2e9;
+    color: var(--danger);
+}
+
+.total-score {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: white;
+    background: var(--text-accent);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 0 #d9534f;
+}
+
+/* --- MOBILE SPECIFIC TWEAKS FOR SCROLLING ISSUE --- */
+@media (max-width: 800px) {
+    body {
+        align-items: center;
+        padding: 10px;
+    }
+
+    .app-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .quiz-section {
+        gap: 10px;
+    }
+
+    .header-hud {
+        padding: 10px 15px;
+    }
+
+    .card-container {
+        height: 250px;
+        margin-bottom: 5px;
+    }
+
+    .card-face {
+        padding: 20px 15px;
+    }
+
+    .card-front {
+        font-size: 1.1rem;
+    }
+
+    .card-front::before {
+        font-size: 2rem;
+        margin-bottom: 5px;
+    }
+
+    .options-grid {
+        gap: 10px;
+    }
+
+    .option-btn {
+        padding: 12px 15px;
+        font-size: 1rem;
+    }
+}
