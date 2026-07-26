@@ -4,57 +4,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oracle SQL Cute Flashcards</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>Oracle SQL 1Z0-171 Quiz & Flashcards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            --card-bg: #ffffff;
-            --text-dark: #4a4a4a;
-            --text-accent: #ff6b6b;
-            --btn-bg: #4ecdc4;
-            --btn-hover: #45b7b0;
+            --panel-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --primary: #fda085;
+            --secondary: #4ecdc4;
+            --secondary-hover: #45b7b0;
+            --correct-bg: #2ed573;
+            --wrong-bg: #ff4757;
+            --btn-hover: #f1f2f6;
+            --border-radius: 20px;
         }
 
         body {
             font-family: 'Nunito', sans-serif;
             background: var(--bg-gradient);
-            color: var(--text-dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            color: var(--text-main);
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
         }
 
-        .container {
+        .app-container {
+            display: flex;
+            flex-direction: row;
             width: 100%;
-            max-width: 450px;
+            max-width: 1200px;
+            gap: 20px;
+            height: 90vh;
+            max-height: 850px;
+        }
+
+        /* Left Panel: Quiz/Flashcard Area */
+        .quiz-panel {
+            flex: 3;
+            background: var(--panel-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            position: relative;
+            overflow-y: auto;
         }
 
-        .hud {
+        .quiz-header {
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            margin-bottom: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #f1f2f6;
+        }
+
+        .topic-badge {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-weight: 800;
-            font-size: 1.1rem;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            font-size: 1.5rem;
+        }
+
+        .timer-container.warning {
+            color: var(--wrong-bg);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .card-container {
             perspective: 1000px;
             width: 100%;
-            height: 350px;
-            cursor: pointer;
-            margin-bottom: 30px;
+            min-height: 220px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .card {
@@ -63,7 +117,6 @@
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            /* Bouncy flip */
         }
 
         .card.is-flipped {
@@ -75,257 +128,569 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 25px;
-            /* Super rounded */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            border-radius: var(--border-radius);
             padding: 30px;
             box-sizing: border-box;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            background: var(--card-bg);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 2px solid #f1f2f6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
+            background: white;
+            overflow-y: auto;
         }
 
         .card-front {
-            color: var(--text-accent);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.4;
         }
 
         .card-front::before {
-            content: "❓";
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+            content: "❓ Question";
+            display: block;
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .card-back {
             transform: rotateY(180deg);
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--text-muted);
+            line-height: 1.6;
         }
 
         .card-back::before {
-            content: "💡";
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+            content: "💡 Fact / Explanation";
+            display: block;
+            font-size: 1rem;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #dfe4ea;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--text-main);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--btn-hover);
+            border-color: #ced6e0;
+            transform: translateX(5px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background: var(--correct-bg) !important;
+            border-color: var(--correct-bg) !important;
+            color: white !important;
+        }
+
+        .option-btn.wrong {
+            background: var(--wrong-bg) !important;
+            border-color: var(--wrong-bg) !important;
+            color: white !important;
+            opacity: 0.8;
         }
 
         code {
-            background-color: #f4f4f4;
+            background: rgba(0, 0, 0, 0.05);
             padding: 2px 6px;
-            border-radius: 6px;
-            color: #d63031;
+            border-radius: 4px;
             font-family: monospace;
-            font-size: 1.1rem;
+            color: #d63031;
         }
 
-        .controls {
+        .action-row {
+            margin-top: auto;
             display: flex;
-            gap: 20px;
-            justify-content: center;
-            width: 100%;
+            justify-content: flex-end;
+            gap: 15px;
         }
 
-        button {
-            background-color: var(--btn-bg);
+        .action-btn {
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 25px;
             border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .action-btn.show {
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #flip-btn {
+            background: var(--secondary);
+        }
+
+        #flip-btn:hover {
+            background: var(--secondary-hover);
+        }
+
+        #next-btn {
+            background: var(--text-main);
+        }
+
+        .score-panel {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-width: 300px;
+        }
+
+        .score-header {
             font-size: 1.2rem;
             font-weight: 800;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 6px 0 var(--btn-hover);
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f2f6;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 0 var(--btn-hover);
+        .topic-score-item {
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            transition: background 0.3s;
         }
 
-        button:active {
-            transform: translateY(6px);
-            box-shadow: 0 0 0 var(--btn-hover);
+        .topic-score-item.active-topic {
+            background: #e0f7fa;
+            border-left: 4px solid var(--secondary);
         }
 
-        .tap-hint {
-            margin-top: 20px;
-            color: white;
+        .topic-score-title {
+            font-size: 0.85rem;
             font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .score-badges {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            flex: 1;
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
             font-size: 0.9rem;
-            opacity: 0.8;
-            letter-spacing: 1px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .badge.green {
+            background: var(--correct-bg);
+        }
+
+        .badge.red {
+            background: var(--wrong-bg);
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+                height: auto;
+                max-height: none;
+            }
+
+            .quiz-panel {
+                min-height: 60vh;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="hud">
-            <div id="topic-display">📂 Topic Here</div>
-            <div id="progress-display">📝 1 / 25</div>
-        </div>
+    <div class="app-container">
+        <div class="quiz-panel">
+            <div class="quiz-header">
+                <div class="topic-badge" id="topic-badge">Topic Loading...</div>
+                <div class="timer-container" id="timer-display">
+                    ⏱️ <span id="time-left">30</span>s
+                </div>
+            </div>
 
-        <div class="card-container" onclick="flipCard()">
-            <div class="card" id="card">
-                <div class="card-face card-front" id="card-front">Question goes here...</div>
-                <div class="card-face card-back" id="card-back">Answer goes here...</div>
+            <div class="card-container">
+                <div class="card" id="flashcard">
+                    <div class="card-face card-front" id="card-front">Loading question...</div>
+                    <div class="card-face card-back" id="card-back">Loading explanation...</div>
+                </div>
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Binary Options injected via JS -->
+            </div>
+
+            <div class="action-row">
+                <button class="action-btn" id="flip-btn" onclick="toggleFlip()">Flip for Info 🔄</button>
+                <button class="action-btn" id="next-btn" onclick="nextQuestion()">Next Question ➡️</button>
             </div>
         </div>
 
-        <div class="controls">
-            <button onclick="prevCard()">⬅️ Back</button>
-            <button onclick="nextCard()">Next ➡️</button>
+        <div class="score-panel">
+            <div class="score-header">📊 Performance Tracker</div>
+            <div id="scoreboard-container">
+                <!-- Score items injected via JS -->
+            </div>
         </div>
-
-        <div class="tap-hint">👆 TAP CARD TO FLIP</div>
     </div>
 
     <script>
         const flashcards = [
             // Topic 1: Architecture
-            { topic: "1. DB Architecture", q: "What is the difference between Logical and Physical storage?", a: "Logical = How we view data (Tables/Columns).<br><br>Physical = How the OS stores it (Datafiles/Blocks)." },
-            { topic: "1. DB Architecture", q: "What is the core goal of the Relational Model?", a: "Data Independence! You can query a table without knowing where it physically lives on the disk." },
+            { topic: "1. DB Architecture", q: "What is the difference between Logical and Physical storage?", a: "Logical = How we view data (Tables/Columns).<br>Physical = How the OS stores it (Datafiles/Blocks).", wrong_a: "Logical = How the OS stores it (Datafiles/Blocks).<br>Physical = How we view data (Tables/Columns)." },
+            { topic: "1. DB Architecture", q: "What is the core goal of the Relational Model?", a: "Data Independence! You can query a table without knowing where it physically lives on the disk.", wrong_a: "Hardware Dependence! You must specify the physical track and sector on the disk to query data." },
 
             // Topic 2: Retrieval & Sorting
-            { topic: "2. Retrieval & Sorting", q: "What is the strict SQL Execution Order?", a: "1. FROM<br>2. WHERE<br>3. GROUP BY<br>4. HAVING<br>5. SELECT<br>6. ORDER BY" },
-            { topic: "2. Retrieval & Sorting", q: "How do you use q-quotes?", a: "To safely print strings with apostrophes without breaking code.<br><br>Example: <code>q'[It's a test]'</code>" },
-            { topic: "2. Retrieval & Sorting", q: "What is the result of ANY arithmetic operation involving a NULL value?", a: "Always NULL." },
-            { topic: "2. Retrieval & Sorting", q: "What is the default ORDER BY behavior for NULLs?", a: "ASC places NULLs LAST.<br><br>DESC places NULLs FIRST." },
-            { topic: "2. Retrieval & Sorting", q: "When do you use Double Quotes vs Single Quotes?", a: "Double Quotes <code>\" \"</code> for column aliases.<br><br>Single Quotes <code>' '</code> for literal text strings." },
-            { topic: "2. Retrieval & Sorting", q: "What is the difference between & and && substitution variables?", a: "<code>&</code> prompts the user every time.<br><br><code>&&</code> prompts once and stores the value for the session." },
-            { topic: "2. Retrieval & Sorting", q: "What does the DEFINE command do?", a: "Hardcodes a substitution variable at the top of a script WITHOUT prompting the user." },
-            { topic: "2. Retrieval & Sorting", q: "What does SET VERIFY ON do?", a: "Forces the client to print the 'old' and 'new' script lines when substitution variables are executed." },
+            { topic: "2. Retrieval & Sorting", q: "What is the strict SQL Execution Order?", a: "1. FROM<br>2. WHERE<br>3. GROUP BY<br>4. HAVING<br>5. SELECT<br>6. ORDER BY", wrong_a: "1. SELECT<br>2. FROM<br>3. WHERE<br>4. GROUP BY<br>5. HAVING<br>6. ORDER BY" },
+            { topic: "2. Retrieval & Sorting", q: "How do you use q-quotes?", a: "To safely print strings with apostrophes. Example: <code>q'[It's a test]'</code>", wrong_a: "To alias columns safely. Example: <code>\"[It's a test]\"</code>" },
+            { topic: "2. Retrieval & Sorting", q: "What is the result of ANY arithmetic operation involving a NULL value?", a: "Always NULL.", wrong_a: "Always 0." },
+            { topic: "2. Retrieval & Sorting", q: "What is the default ORDER BY behavior for NULLs?", a: "ASC places NULLs LAST.<br>DESC places NULLs FIRST.", wrong_a: "ASC places NULLs FIRST.<br>DESC places NULLs LAST." },
+            { topic: "2. Retrieval & Sorting", q: "When do you use Double Quotes vs Single Quotes?", a: "Double Quotes <code>\" \"</code> for column aliases.<br>Single Quotes <code>' '</code> for literal strings.", wrong_a: "Single Quotes <code>' '</code> for column aliases.<br>Double Quotes <code>\" \"</code> for literal strings." },
+            { topic: "2. Retrieval & Sorting", q: "What is the difference between & and && substitution variables?", a: "<code>&</code> prompts the user every time.<br><code>&&</code> prompts once and stores the value for the session.", wrong_a: "<code>&&</code> prompts the user every time.<br><code>&</code> prompts once and stores the value for the session." },
+            { topic: "2. Retrieval & Sorting", q: "What does the DEFINE command do?", a: "Hardcodes a substitution variable at the top of a script WITHOUT prompting the user.", wrong_a: "Prompts the user every time the script is executed to define a new value." },
+            { topic: "2. Retrieval & Sorting", q: "What does SET VERIFY ON do?", a: "Forces the client to print the 'old' and 'new' script lines when variables are executed.", wrong_a: "Validates the syntax of the SQL statement before execution." },
 
             // Topic 3: Functions & Aggregation
-            { topic: "3. Functions & Aggregation", q: "What does TRUNC(SYSDATE, 'YEAR') return?", a: "January 1st of the current year." },
-            { topic: "3. Functions & Aggregation", q: "What is a highly tested use case for the MOD function?", a: "Finding even/odd numbers!<br><br><code>MOD(salary, 2) = 0</code> means it is even." },
-            { topic: "3. Functions & Aggregation", q: "What is the strict rule for NVL data types?", a: "Both arguments inside <code>NVL(arg1, arg2)</code> MUST be the exact same data type." },
-            { topic: "3. Functions & Aggregation", q: "How does COALESCE differ from NVL?", a: "NVL takes exactly two arguments.<br><br>COALESCE takes unlimited arguments and returns the FIRST non-null value." },
-            { topic: "3. Functions & Aggregation", q: "What does NULLIF(a, b) return if the values match?", a: "It returns NULL! (If they differ, it returns 'a')." },
-            { topic: "3. Functions & Aggregation", q: "Which group function does NOT ignore NULL values?", a: "<code>COUNT(*)</code> counts all rows, including NULLs." },
-            { topic: "3. Functions & Aggregation", q: "How does COUNT(column_name) handle NULLs?", a: "Unlike COUNT(*), COUNT(column_name) completely ignores NULL values. It only counts rows where that specific column has data." },
-            { topic: "3. Functions & Aggregation", q: "What do the AVG() and MAX() functions do?", a: "AVG() calculates the mathematical average of a numeric column. MAX() returns the highest value in a set (works on numbers, dates, and strings)." },
-            { topic: "3. Functions & Aggregation", q: "What is the strict rule connecting SELECT and GROUP BY?", a: "If a column in your SELECT list is NOT inside an aggregate function, it MUST be listed in your GROUP BY clause." },
-            { topic: "3. Functions & Aggregation", q: "What is the difference between WHERE and HAVING?", a: "WHERE filters rows BEFORE grouping.<br><br>HAVING filters groups AFTER aggregation." },
-            { topic: "3. Functions & Aggregation", q: "What major GROUP BY upgrade was introduced in Oracle 23ai?", a: "You can now use column aliases inside the GROUP BY and HAVING clauses!" },
+            { topic: "3. Functions & Aggregation", q: "What does TRUNC(SYSDATE, 'YEAR') return?", a: "January 1st of the current year.", wrong_a: "December 31st of the current year." },
+            { topic: "3. Functions & Aggregation", q: "What is a highly tested use case for the MOD function?", a: "Finding even/odd numbers! (e.g., <code>MOD(salary, 2) = 0</code>)", wrong_a: "Finding the absolute mathematical value of a negative number." },
+            { topic: "3. Functions & Aggregation", q: "What is the strict rule for NVL data types?", a: "Both arguments inside <code>NVL(arg1, arg2)</code> MUST be the exact same data type.", wrong_a: "Arguments can be any data type; Oracle implicitly converts them." },
+            { topic: "3. Functions & Aggregation", q: "How does COALESCE differ from NVL?", a: "NVL takes exactly two arguments.<br>COALESCE takes unlimited arguments and returns FIRST non-null.", wrong_a: "COALESCE evaluates all arguments before returning.<br>NVL uses short-circuit evaluation." },
+            { topic: "3. Functions & Aggregation", q: "What does NULLIF(a, b) return if the values match?", a: "It returns NULL!", wrong_a: "It returns TRUE!" },
+            { topic: "3. Functions & Aggregation", q: "Which group function does NOT ignore NULL values?", a: "<code>COUNT(*)</code> counts all rows, including NULLs.", wrong_a: "<code>AVG()</code> factors NULLs in as zeros." },
+            { topic: "3. Functions & Aggregation", q: "How does COUNT(column_name) handle NULLs?", a: "It completely ignores NULL values. It only counts rows where that specific column has data.", wrong_a: "It counts all rows in the table, including rows where the column is NULL." },
+            { topic: "3. Functions & Aggregation", q: "What do the AVG() and MAX() functions do?", a: "AVG() calculates the mathematical average. MAX() returns the highest value in a set.", wrong_a: "MAX() calculates the mathematical average. AVG() returns the highest value in a set." },
+            { topic: "3. Functions & Aggregation", q: "What is the strict rule connecting SELECT and GROUP BY?", a: "If a column in your SELECT list is NOT inside an aggregate function, it MUST be listed in your GROUP BY clause.", wrong_a: "If a column is listed in your GROUP BY clause, it MUST be selected in the SELECT list." },
+            { topic: "3. Functions & Aggregation", q: "What is the difference between WHERE and HAVING?", a: "WHERE filters rows BEFORE grouping.<br>HAVING filters groups AFTER aggregation.", wrong_a: "HAVING filters rows BEFORE grouping.<br>WHERE filters groups AFTER aggregation." },
+            { topic: "3. Functions & Aggregation", q: "What major GROUP BY upgrade was introduced in Oracle 23ai?", a: "You can now use column aliases inside the GROUP BY and HAVING clauses!", wrong_a: "The GROUP BY clause is now entirely optional for aggregate functions." },
 
             // Topic 4: Joins
-            { topic: "4. Joins", q: "What causes an ORA-00918 (Ambiguous Column) error?", a: "Joining tables with a shared column name without using a table alias prefix." },
-            { topic: "4. Joins", q: "What is the strict rule when using the ANSI USING clause?", a: "You are forbidden from putting a table prefix (like <code>e.dept_id</code>) anywhere in the query for the join column." },
-            { topic: "4. Joins", q: "Where does the Oracle (+) operator go in an outer join?", a: "Always on the DEFICIENT side (the table missing the data)." },
-            { topic: "4. Joins", q: "Why will the query FROM employees SELF JOIN employees fail?", a: "SELF JOIN is not a real keyword! You must use standard JOIN and assign different table aliases." },
-            { topic: "4. Joins", q: "Why can't you use the USING clause in a Non-Equijoin?", a: "Because there are no exactly matching column names. You MUST use the ON clause." },
-            { topic: "4. Joins", q: "What causes a Cartesian Product?", a: "Accidentally omitting a join condition or WHERE clause, causing rows to multiply (Table A × Table B)." },
-            { topic: "4. Joins", q: "What is a NATURAL JOIN?", a: "An automatic join that links two tables using ALL columns that have the exact same name and compatible data types." },
-            { topic: "4. Joins", q: "What does a FULL OUTER JOIN do?", a: "Returns all matched rows, PLUS all unmatched rows from the left table, PLUS all unmatched rows from the right table." },
-            { topic: "4. Joins", q: "What happens in an INNER JOIN if no rows match the condition?", a: "It simply returns an empty result set (zero rows). It does not throw an error." },
+            { topic: "4. Joins", q: "What causes an ORA-00918 (Ambiguous Column) error?", a: "Joining tables with a shared column name without using a table alias prefix.", wrong_a: "Using a table alias in the SELECT clause that hasn't been defined in the FROM clause." },
+            { topic: "4. Joins", q: "What is the strict rule when using the ANSI USING clause?", a: "You are forbidden from putting a table prefix anywhere in the query for the join column.", wrong_a: "You MUST put a table prefix on the join column to avoid ambiguity." },
+            { topic: "4. Joins", q: "Where does the Oracle (+) operator go in an outer join?", a: "Always on the DEFICIENT side (the table missing the data).", wrong_a: "Always on the DOMINANT side (the table that contains all the data)." },
+            { topic: "4. Joins", q: "Why will the query FROM emp SELF JOIN emp fail?", a: "SELF JOIN is not a real keyword! You must use standard JOIN and assign different table aliases.", wrong_a: "It will actually succeed and automatically link identical columns." },
+            { topic: "4. Joins", q: "Why can't you use the USING clause in a Non-Equijoin?", a: "Because there are no exactly matching column names. You MUST use the ON clause.", wrong_a: "Because Non-Equijoins require the NATURAL JOIN syntax." },
+            { topic: "4. Joins", q: "What causes a Cartesian Product?", a: "Accidentally omitting a join condition or WHERE clause, causing rows to multiply.", wrong_a: "Filtering out unmatched rows from both tables simultaneously." },
+            { topic: "4. Joins", q: "What is a NATURAL JOIN?", a: "An automatic join that links two tables using ALL columns that have the exact same name and compatible data types.", wrong_a: "A join that exclusively links tables using their defined Primary Key and Foreign Key constraints." },
+            { topic: "4. Joins", q: "What does a FULL OUTER JOIN do?", a: "Returns all matched rows, PLUS all unmatched rows from the left table, PLUS all unmatched rows from the right.", wrong_a: "Returns only the rows that have a perfect match in both tables." },
+            { topic: "4. Joins", q: "What happens in an INNER JOIN if no rows match the condition?", a: "It simply returns an empty result set (zero rows).", wrong_a: "It throws an ORA-01403: No Data Found error." },
 
             // Topic 5: Subqueries 
-            { topic: "5. Subqueries", q: "What causes a Subquery ORA-01427 Error?", a: "Occurs when a single-row subquery using standard comparison operators (=, <, >) accidentally returns multiple rows." },
-            { topic: "5. Subqueries", q: "What is a Multiple-Column Subquery?", a: "A subquery that returns more than one column. It requires comparing multiple columns simultaneously in the outer query: <code>WHERE (col1, col2) IN (SELECT...)</code>" },
-            { topic: "5. Subqueries", q: "What is the NOT IN and NULL Trap?", a: "If a multiple-row subquery using NOT IN returns even a single NULL value, the outer query will return zero rows." },
-            { topic: "5. Subqueries", q: "What is the synonym for the = ANY operator?", a: "The <code>= ANY</code> operator is mathematically identical to the <code>IN</code> operator." },
-            { topic: "5. Subqueries", q: "What is the UPDATE SET Alias Trap?", a: "Oracle strictly forbids prefixing the target column in the SET clause with a table alias (e.g., <code>SET e.bonus = 100</code> will crash)." },
-            { topic: "5. Subqueries", q: "What is the MERGE Statement used for?", a: "A modern alternative to correlated subqueries for modifying data. It avoids row-by-row looping and allows aliases in the SET clause." },
-            { topic: "5. Subqueries", q: "What are Updatable Inline Views?", a: "Oracle proprietary syntax that allows you to directly UPDATE the result of a SELECT statement joining two tables." },
+            { topic: "5. Subqueries", q: "What causes a Subquery ORA-01427 Error?", a: "Occurs when a single-row subquery using standard comparison operators (=, <) accidentally returns multiple rows.", wrong_a: "Occurs when a multiple-row subquery using IN accidentally returns a single row." },
+            { topic: "5. Subqueries", q: "What is a Multiple-Column Subquery?", a: "A subquery that returns more than one column. It requires comparing multiple columns simultaneously: <code>WHERE (c1, c2) IN (SELECT...)</code>", wrong_a: "A subquery that selects only one column, but queries it from multiple joined tables." },
+            { topic: "5. Subqueries", q: "What is the NOT IN and NULL Trap?", a: "If a multiple-row subquery using NOT IN returns even a single NULL value, the outer query returns zero rows.", wrong_a: "If a subquery returns NULL, it is ignored and matches the remaining valid values." },
+            { topic: "5. Subqueries", q: "What is the synonym for the = ANY operator?", a: "The <code>= ANY</code> operator is mathematically identical to the <code>IN</code> operator.", wrong_a: "The <code>= ANY</code> operator is mathematically identical to the <code>EXISTS</code> operator." },
+            { topic: "5. Subqueries", q: "What is the UPDATE SET Alias Trap?", a: "Oracle strictly forbids prefixing the target column in the SET clause with a table alias.", wrong_a: "Oracle requires prefixing the target column in the SET clause with a table alias." },
+            { topic: "5. Subqueries", q: "What is the MERGE Statement used for?", a: "A modern alternative to correlated subqueries for modifying data. It avoids row-by-row looping.", wrong_a: "Used exclusively for combining multiple SELECT statements into one result set." },
+            { topic: "5. Subqueries", q: "What are Updatable Inline Views?", a: "Oracle proprietary syntax allowing you to directly UPDATE the result of a SELECT statement joining two tables.", wrong_a: "Views that can only be updated if they contain zero joins or functions." },
 
             // Topic 6: Set Operators
-            { topic: "6. Set Operators", q: "What is the rule for columns in Set Operators?", a: "The number of columns and their data types must match exactly across all queries being combined." },
-            { topic: "6. Set Operators", q: "How are output column names determined in Set Operators?", a: "The column names in the final output are strictly determined by the first SELECT statement." },
-            { topic: "6. Set Operators", q: "What is the difference between UNION and UNION ALL?", a: "UNION removes duplicates and implicitly sorts. UNION ALL retains duplicates, skips sorting, and is much faster." },
-            { topic: "6. Set Operators", q: "What is the difference between INTERSECT and INTERSECT ALL?", a: "INTERSECT returns only the unique rows that exist in BOTH result sets. 'INTERSECT ALL' is a trick exam answer—it does not exist in Oracle SQL!" },
-            { topic: "6. Set Operators", q: "How do Set Operators handle NULLs?", a: "Unlike standard WHERE clauses (where NULL = NULL is false), Set Operators treat two NULL values as mathematically EQUAL when comparing rows for duplicates or matches." },
-            { topic: "6. Set Operators", q: "What is the ANSI standard synonym for the MINUS operator?", a: "MINUS is Oracle proprietary. The ANSI standard equivalent is <code>EXCEPT</code>." },
-            { topic: "6. Set Operators", q: "What are Dummy Columns in Set Operators?", a: "Used to balance the column count in Set Operators. Example: <code>SELECT name, age FROM A MINUS SELECT name, NULL FROM B</code>." },
-            { topic: "6. Set Operators", q: "What is the ORDER BY rule in Set Operators?", a: "You can only use one ORDER BY clause, it must be at the very end of the statement, and it must reference the first query's columns." },
-            { topic: "6. Set Operators", q: "What is the Implicit Sort Trap?", a: "While UNION implicitly sorts data to remove duplicates, you must still use an explicit ORDER BY if the output strictly requires sorting." },
+            { topic: "6. Set Operators", q: "What is the rule for columns in Set Operators?", a: "The number of columns and their data types must match exactly across all queries being combined.", wrong_a: "Only the number of columns must match; data types are implicitly converted." },
+            { topic: "6. Set Operators", q: "How are output column names determined in Set Operators?", a: "The column names in the final output are strictly determined by the FIRST SELECT statement.", wrong_a: "The column names in the final output are strictly determined by the LAST SELECT statement." },
+            { topic: "6. Set Operators", q: "What is the difference between UNION and UNION ALL?", a: "UNION removes duplicates and implicitly sorts.<br>UNION ALL retains duplicates and skips sorting.", wrong_a: "UNION ALL removes duplicates and implicitly sorts.<br>UNION retains duplicates and skips sorting." },
+            { topic: "6. Set Operators", q: "What is the difference between INTERSECT and INTERSECT ALL?", a: "INTERSECT returns only unique rows in BOTH result sets.<br>'INTERSECT ALL' does not exist in Oracle SQL!", wrong_a: "INTERSECT ALL returns duplicate rows that exist in both result sets." },
+            { topic: "6. Set Operators", q: "How do Set Operators handle NULLs?", a: "Set Operators treat two NULL values as mathematically EQUAL when comparing rows for duplicates/matches.", wrong_a: "Set Operators treat two NULL values as mathematically UNEQUAL." },
+            { topic: "6. Set Operators", q: "What is the ANSI standard synonym for the MINUS operator?", a: "MINUS is Oracle proprietary. The ANSI standard equivalent is <code>EXCEPT</code>.", wrong_a: "MINUS is Oracle proprietary. The ANSI standard equivalent is <code>DIFFERENCE</code>." },
+            { topic: "6. Set Operators", q: "What are Dummy Columns in Set Operators?", a: "Used to balance the column count. Example: <code>SELECT name, age FROM A MINUS SELECT name, NULL FROM B</code>.", wrong_a: "Used to generate random alphanumeric data for testing purposes." },
+            { topic: "6. Set Operators", q: "What is the ORDER BY rule in Set Operators?", a: "Only one ORDER BY clause allowed, at the very end of the statement, referencing the first query's columns.", wrong_a: "Each individual SELECT statement in the set operation can have its own ORDER BY clause." },
+            { topic: "6. Set Operators", q: "What is the Implicit Sort Trap?", a: "UNION implicitly sorts, but you MUST use explicit ORDER BY if strict sorting is required.", wrong_a: "UNION guarantees the output sort order permanently without an ORDER BY." },
 
             // Topic 7: DML Statements
-            { topic: "7. DML Statements", q: "What is the difference between Explicit and Implicit INSERT?", a: "Explicit lists the columns (safest). Implicit skips the columns but strictly requires every value in the exact order of table creation." },
-            { topic: "7. DML Statements", q: "How do you use the DEFAULT keyword in INSERT?", a: "In an INSERT statement, you can literally type the word DEFAULT in the VALUES list to trigger the column's default value." },
-            { topic: "7. DML Statements", q: "What triggers an Implicit Commit?", a: "Running any DDL (CREATE, ALTER, DROP) or DCL (GRANT, REVOKE) statement automatically and permanently commits any pending DML transactions." },
-            { topic: "7. DML Statements", q: "What is Read Consistency in Oracle?", a: "Before a COMMIT, only you can see your DML changes. Other users querying the database will see the original, unchanged data." },
-            { topic: "7. DML Statements", q: "How does UNIQUE handle NULL values?", a: "A UNIQUE constraint allows multiple NULL values because Oracle considers 'unknown' values to be mathematically distinct from each other." },
-            { topic: "7. DML Statements", q: "What is the PRIMARY KEY rule?", a: "A Primary Key is the combination of NOT NULL + UNIQUE. A table can only have exactly ONE Primary Key." },
-            { topic: "7. DML Statements", q: "Why is constraint naming a best practice?", a: "Always explicitly name constraints (e.g., <code>emp_id_pk</code>) so error messages are readable. Otherwise, Oracle auto-generates a meaningless <code>SYS_C###</code> name." },
+            { topic: "7. DML Statements", q: "What is the difference between Explicit and Implicit INSERT?", a: "Explicit lists the columns. Implicit skips columns but requires exact table order.", wrong_a: "Implicit lists the columns. Explicit skips columns but requires exact table order." },
+            { topic: "7. DML Statements", q: "How do you use the DEFAULT keyword in INSERT?", a: "Literally type the word DEFAULT in the VALUES list to trigger the column's default value.", wrong_a: "Leave the column completely out of the VALUES list to trigger the default value." },
+            { topic: "7. DML Statements", q: "What triggers an Implicit Commit?", a: "Running any DDL (CREATE, ALTER) or DCL (GRANT) statement automatically commits pending DML.", wrong_a: "Running standard SELECT queries automatically commits pending DML." },
+            { topic: "7. DML Statements", q: "What is Read Consistency in Oracle?", a: "Before a COMMIT, only you can see your DML changes. Others see the original data.", wrong_a: "Before a COMMIT, others can see your uncommitted changes (Dirty Read)." },
+            { topic: "7. DML Statements", q: "How does UNIQUE handle NULL values?", a: "A UNIQUE constraint allows multiple NULL values (unknowns are mathematically distinct).", wrong_a: "A UNIQUE constraint allows one and only one NULL value." },
+            { topic: "7. DML Statements", q: "What is the PRIMARY KEY rule?", a: "NOT NULL + UNIQUE. A table can only have exactly ONE Primary Key.", wrong_a: "UNIQUE only. A table can have multiple Primary Keys." },
+            { topic: "7. DML Statements", q: "Why is constraint naming a best practice?", a: "Always explicitly name constraints (e.g., <code>emp_id_pk</code>) so error messages are readable.", wrong_a: "Let Oracle auto-generate <code>SYS_C###</code> names to improve indexing speed." },
 
             // Topic 8: DDL
-            { topic: "8. DDL", q: "What is a Foreign Key?", a: "A column (or combination of columns) that establishes a relationship between two tables by referencing the Primary Key or Unique Key of another table." },
-            { topic: "8. DDL", q: "What does a CHECK Constraint do?", a: "Verifies that column values satisfy a specific condition (e.g., salary > 0) before allowing the database to execute an INSERT or UPDATE." },
-            { topic: "8. DDL", q: "What is the CLOB Data Type?", a: "Character Large Object. Used to store massive amounts of character data that exceed the standard 4,000-byte limit of VARCHAR2." },
-            { topic: "8. DDL", q: "What is the difference between VARCHAR2 and CHAR?", a: "VARCHAR2 is variable-length and only uses the space needed. CHAR is fixed-length and pads empty space with invisible blanks." },
-            { topic: "8. DDL", q: "What are the size rules for VARCHAR2 vs CHAR?", a: "VARCHAR2 strictly requires a size (e.g., VARCHAR2(50)). If you omit the size for CHAR, it defaults to CHAR(1)." },
-            { topic: "8. DDL", q: "What is the Namespace Rule in Oracle?", a: "Tables and Views share the same namespace in Oracle. You cannot have a table and a view with the exact same name." },
-            { topic: "8. DDL", q: "What is the NOT NULL constraint rule?", a: "The NOT NULL constraint is the only constraint that MUST be defined at the column level. It cannot be defined at the table level." },
-            { topic: "8. DDL", q: "How do you define a Composite Key constraint?", a: "If a PRIMARY KEY or UNIQUE constraint requires multiple columns, it MUST be defined using the table-level syntax at the bottom of the CREATE statement." },
-            { topic: "8. DDL", q: "What is the difference between a View and a Sequence?", a: "A View is a logical window based on a SELECT query (stores no data). A Sequence is an independent object that auto-generates unique numbers." },
-            { topic: "8. DDL", q: "What is the difference between DROP COLUMN and SET UNUSED?", a: "DROP physically removes data and is slow on large tables. SET UNUSED logically hides the column instantly, avoiding database locks." },
-            { topic: "8. DDL", q: "What are the rules for TRUNCATE TABLE?", a: "It is a DDL statement, meaning it cannot be rolled back (implicit commit). It deletes all rows instantly and releases physical storage space. No WHERE clause allowed." },
-            { topic: "8. DDL", q: "How do Global Temporary Tables (GTT) work?", a: "The structure is permanent and visible to all, but the data is private to the session. Defaults to ON COMMIT DELETE ROWS." },
-            { topic: "8. DDL", q: "What does ON COMMIT PRESERVE ROWS do?", a: "Used in GTTs to keep the private data alive through commits. The data is only wiped when the user's session ends." },
-            { topic: "8. DDL", q: "What are the restrictions on External Tables?", a: "They are strictly read-only. You cannot run DML (INSERT, UPDATE, DELETE) or create indexes on them." },
-            { topic: "8. DDL", q: "What is ORGANIZATION EXTERNAL?", a: "The mandatory clause in a CREATE TABLE statement that maps the table to an operating system flat file using an access driver like ORACLE_LOADER." },
-            { topic: "8. DDL", q: "What does WITH CHECK OPTION do on a view?", a: "A view constraint that prevents users from running UPDATE or INSERT statements that would cause the row to violate the view's WHERE clause." },
+            { topic: "8. DDL", q: "What is a Foreign Key?", a: "A column that establishes a relationship by referencing the Primary/Unique Key of another table.", wrong_a: "A column that establishes a relationship by referencing any column in another table." },
+            { topic: "8. DDL", q: "What does a CHECK Constraint do?", a: "Verifies column values satisfy a specific condition before allowing an INSERT or UPDATE.", wrong_a: "Automatically fixes invalid data upon INSERT to match table requirements." },
+            { topic: "8. DDL", q: "What is the CLOB Data Type?", a: "Character Large Object. Used to store massive amounts of text exceeding 4,000 bytes.", wrong_a: "Used to store massive binary files like images and videos (BLOB)." },
+            { topic: "8. DDL", q: "What is the difference between VARCHAR2 and CHAR?", a: "VARCHAR2 is variable-length. CHAR is fixed-length and pads empty space with invisible blanks.", wrong_a: "CHAR is variable-length. VARCHAR2 is fixed-length and pads empty space." },
+            { topic: "8. DDL", q: "What are the size rules for VARCHAR2 vs CHAR?", a: "VARCHAR2 strictly requires a size. If you omit the size for CHAR, it defaults to CHAR(1).", wrong_a: "CHAR strictly requires a size. If you omit the size for VARCHAR2, it defaults to VARCHAR2(1)." },
+            { topic: "8. DDL", q: "What is the Namespace Rule in Oracle?", a: "Tables and Views share the same namespace. You cannot have a table and view with the exact same name.", wrong_a: "Tables and Views are in separate namespaces. You can have a table and view with the exact same name." },
+            { topic: "8. DDL", q: "What is the NOT NULL constraint rule?", a: "The NOT NULL constraint is the only constraint that MUST be defined at the column level.", wrong_a: "The NOT NULL constraint is the only constraint that MUST be defined at the table level." },
+            { topic: "8. DDL", q: "How do you define a Composite Key constraint?", a: "If a constraint requires multiple columns, it MUST be defined using table-level syntax.", wrong_a: "If a constraint requires multiple columns, it MUST be defined using column-level syntax." },
+            { topic: "8. DDL", q: "What is the difference between a View and a Sequence?", a: "A View is a logical window based on a SELECT. A Sequence auto-generates unique numbers.", wrong_a: "A Sequence is a logical window based on a SELECT. A View auto-generates unique numbers." },
+            { topic: "8. DDL", q: "What is the difference between DROP COLUMN and SET UNUSED?", a: "DROP physically removes data (slow). SET UNUSED logically hides the column instantly.", wrong_a: "SET UNUSED physically removes data (slow). DROP logically hides the column instantly." },
+            { topic: "8. DDL", q: "What are the rules for TRUNCATE TABLE?", a: "DDL statement (cannot rollback). Deletes all rows instantly and releases storage space.", wrong_a: "DML statement (can rollback). Deletes rows slowly row-by-row." },
+            { topic: "8. DDL", q: "How do Global Temporary Tables (GTT) work?", a: "Structure is permanent and visible to all, but the data is private to the session.", wrong_a: "Structure and data are private to the session and deleted on disconnect." },
+            { topic: "8. DDL", q: "What does ON COMMIT PRESERVE ROWS do?", a: "Used in GTTs to keep private data alive through commits until the session ends.", wrong_a: "Used in GTTs to completely wipe data after every commit." },
+            { topic: "8. DDL", q: "What are the restrictions on External Tables?", a: "They are strictly read-only. You cannot run DML (INSERT, UPDATE) or create indexes on them.", wrong_a: "They support standard DML operations, but the data is stored outside the database." },
+            { topic: "8. DDL", q: "What is ORGANIZATION EXTERNAL?", a: "Clause mapping a table to an operating system flat file using an access driver.", wrong_a: "Clause mapping a table to a remote schema in a different Oracle database." },
+            { topic: "8. DDL", q: "What does WITH CHECK OPTION do on a view?", a: "Prevents users from running DML statements that would cause the row to violate the view's WHERE clause.", wrong_a: "Allows users to run DML statements that completely bypass the view's WHERE clause." },
 
             // Topic 9: Managing Indexes, Synonyms, and Sequences
-            { topic: "9. Indexes, Synonyms & Sequences", q: "What is the primary purpose of a Synonym?", a: "Provides an alternative name (alias) for a database object to simplify long names or hide the schema owner. It stores no data itself." },
-            { topic: "9. Indexes, Synonyms & Sequences", q: "What is the rule for Sequence CURRVAL?", a: "You MUST call NEXTVAL at least once in your current session before you are allowed to query CURRVAL, otherwise Oracle throws an error." },
-            { topic: "9. Indexes, Synonyms & Sequences", q: "What does Identity Column Strict Mode do?", a: "Defining a column as GENERATED ALWAYS AS IDENTITY forces the database to reject any manual inserts provided by a user for that column." },
+            { topic: "9. Indexes, Synonyms & Sequences", q: "What is the primary purpose of a Synonym?", a: "Provides an alternative name (alias) for an object to hide the schema owner. Stores no data.", wrong_a: "Creates a physical copy of a table to improve query performance." },
+            { topic: "9. Indexes, Synonyms & Sequences", q: "What is the rule for Sequence CURRVAL?", a: "You MUST call NEXTVAL at least once in your current session before querying CURRVAL.", wrong_a: "You can call CURRVAL at any time to see the current absolute database value." },
+            { topic: "9. Indexes, Synonyms & Sequences", q: "What does Identity Column Strict Mode do?", a: "<code>GENERATED ALWAYS AS IDENTITY</code> forces the database to reject manual user inserts.", wrong_a: "<code>GENERATED BY DEFAULT AS IDENTITY</code> forces the database to reject manual user inserts." },
 
             // Topic 10: Controlling User Access
-            { topic: "10. Controlling User Access", q: "What is the difference between System and Object privileges?", a: "System privileges grant database-wide powers (e.g., CREATE TABLE). Object privileges grant rights to specific targets and strictly require the ON keyword (e.g., SELECT ON hr.employees)." },
-            { topic: "10. Controlling User Access", q: "What is the difference between WITH GRANT OPTION and WITH ADMIN OPTION?", a: "WITH GRANT OPTION is for Object privileges (revokes cascade). WITH ADMIN OPTION is for System privileges (revokes do NOT cascade)." },
-            { topic: "10. Controlling User Access", q: "What is the 3-Step Process for Roles?", a: "1) Create the role. 2) Grant system or object privileges to the role. 3) Grant the role to the users." },
+            { topic: "10. Controlling User Access", q: "What is the difference between System and Object privileges?", a: "System = DB-wide powers (CREATE TABLE). Object = specific targets, requires ON keyword.", wrong_a: "Object = DB-wide powers (CREATE TABLE). System = specific targets, requires ON keyword." },
+            { topic: "10. Controlling User Access", q: "What is the difference between WITH GRANT OPTION and WITH ADMIN OPTION?", a: "GRANT OPTION is for Object privileges (revokes cascade). ADMIN OPTION is for System privileges.", wrong_a: "ADMIN OPTION is for Object privileges (revokes cascade). GRANT OPTION is for System privileges." },
+            { topic: "10. Controlling User Access", q: "What is the 3-Step Process for Roles?", a: "1) Create the role. 2) Grant privileges to the role. 3) Grant the role to the users.", wrong_a: "1) Create user. 2) Grant privileges to user. 3) Convert user into a role." },
 
             // Topic 11: Data Dictionary & Time Zones
-            { topic: "11. Data Dictionary & Time Zones", q: "What do the Data Dictionary prefixes (USER_, ALL_, DBA_) mean?", a: "USER_ = Objects you own. ALL_ = Objects you have access to. DBA_ = Every object in the database (requires DBA privileges)." },
-            { topic: "11. Data Dictionary & Time Zones", q: "What is the difference between Session and Server time zone functions?", a: "Functions prefixed with CURRENT_ or LOCAL return the session's time. Functions prefixed with SYS (like SYSDATE) return the database server's OS time." },
-            { topic: "11. Data Dictionary & Time Zones", q: "What does CURRENT_TIMESTAMP return?", a: "The specific time zone function that returns the session's date, fractional seconds, AND the explicit time zone offset (e.g., +02:00)." },
-            { topic: "11. Data Dictionary & Time Zones", q: "What are the two INTERVAL Data Types?", a: "The two specific types used for date arithmetic are INTERVAL YEAR TO MONTH (e.g., '2-6') and INTERVAL DAY TO SECOND (e.g., '4 12:30:00')." }
+            { topic: "11. Data Dictionary & Time Zones", q: "What do the Data Dictionary prefixes (USER_, ALL_, DBA_) mean?", a: "USER_ = Objects you own. ALL_ = Objects you have access to. DBA_ = Every object in the database.", wrong_a: "ALL_ = Objects you own. DBA_ = Objects you have access to. USER_ = Every object in the database." },
+            { topic: "11. Data Dictionary & Time Zones", q: "What is the difference between Session and Server time zone functions?", a: "CURRENT_/LOCAL = session's time. SYS functions (SYSDATE) = server's OS time.", wrong_a: "SYS functions (SYSDATE) = session's time. CURRENT_/LOCAL = server's OS time." },
+            { topic: "11. Data Dictionary & Time Zones", q: "What does CURRENT_TIMESTAMP return?", a: "The session's date, fractional seconds, AND the explicit time zone offset (e.g., +02:00).", wrong_a: "The server's date, fractional seconds, but NO time zone offset." },
+            { topic: "11. Data Dictionary & Time Zones", q: "What are the two INTERVAL Data Types?", a: "<code>INTERVAL YEAR TO MONTH</code> and <code>INTERVAL DAY TO SECOND</code>.", wrong_a: "<code>INTERVAL YEAR TO DAY</code> and <code>INTERVAL MONTH TO SECOND</code>." }
         ];
 
-        let currentIndex = 0;
-        const cardEl = document.getElementById('card');
-        const frontEl = document.getElementById('card-front');
-        const backEl = document.getElementById('card-back');
-        const topicEl = document.getElementById('topic-display');
-        const progressEl = document.getElementById('progress-display');
+        let currentCardIndex = 0;
+        let timerInterval;
+        let timeLeft = 30;
+        let isAnswered = false;
+        let currentDeck = [];
 
-        function updateCard() {
-            cardEl.classList.remove('is-flipped');
+        // Extract unique topics for scoreboard
+        const topics = [...new Set(flashcards.map(c => c.topic))];
+        const scores = {};
+        topics.forEach(t => {
+            scores[t] = { correct: 0, wrong: 0 };
+        });
 
-            setTimeout(() => {
-                const currentCard = flashcards[currentIndex];
-                frontEl.innerHTML = currentCard.q;
-                backEl.innerHTML = currentCard.a;
-                topicEl.innerHTML = `📂 ${currentCard.topic}`;
-                progressEl.innerHTML = `📝 ${currentIndex + 1} / ${flashcards.length}`;
-            }, 150);
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
         }
 
-        function flipCard() {
-            cardEl.classList.toggle('is-flipped');
+        function initScoreboard() {
+            const container = document.getElementById('scoreboard-container');
+            container.innerHTML = '';
+            topics.forEach(topic => {
+                const div = document.createElement('div');
+                div.className = 'topic-score-item';
+                div.id = `score-${topic.replace(/[^a-zA-Z0-9]/g, '')}`;
+
+                div.innerHTML = `
+                <div class="topic-score-title" title="${topic}">${topic}</div>
+                <div class="score-badges">
+                    <div class="badge green">✔️ <span class="correct-count">0</span></div>
+                    <div class="badge red">❌ <span class="wrong-count">0</span></div>
+                </div>
+            `;
+                container.appendChild(div);
+            });
         }
 
-        function nextCard() {
-            currentIndex = (currentIndex + 1) % flashcards.length;
-            updateCard();
+        function updateScoreboard(activeTopic) {
+            // Update Numbers
+            topics.forEach(topic => {
+                const id = `score-${topic.replace(/[^a-zA-Z0-9]/g, '')}`;
+                const el = document.getElementById(id);
+                if (el) {
+                    el.querySelector('.correct-count').innerText = scores[topic].correct;
+                    el.querySelector('.wrong-count').innerText = scores[topic].wrong;
+
+                    // Highlight active topic
+                    if (topic === activeTopic) {
+                        el.classList.add('active-topic');
+                    } else {
+                        el.classList.remove('active-topic');
+                    }
+                }
+            });
         }
 
-        function prevCard() {
-            currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
-            updateCard();
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            isAnswered = false;
+
+            const display = document.getElementById('time-left');
+            const container = document.getElementById('timer-display');
+            display.innerText = timeLeft;
+            container.classList.remove('warning');
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                display.innerText = timeLeft;
+
+                if (timeLeft <= 10) {
+                    container.classList.add('warning');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
         }
 
-        // Initialize on load
-        updateCard();
+        function loadQuestion() {
+            if (currentCardIndex >= currentDeck.length) {
+                document.getElementById('card-front').innerHTML = "🎉 All questions completed! Check your scoreboard.";
+                document.getElementById('card-back').innerHTML = "You're ready for the 1Z0-171 Exam!";
+                document.getElementById('options-container').innerHTML = '';
+                document.getElementById('flip-btn').classList.remove('show');
+                document.getElementById('next-btn').classList.remove('show');
+                clearInterval(timerInterval);
+                return;
+            }
+
+            const card = currentDeck[currentCardIndex];
+            updateScoreboard(card.topic);
+
+            // Reset UI
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            document.getElementById('flip-btn').classList.remove('show');
+            document.getElementById('next-btn').classList.remove('show');
+
+            // Set Header & Card Text
+            document.getElementById('topic-badge').innerText = `${card.topic} (${currentCardIndex + 1}/${currentDeck.length})`;
+            document.getElementById('card-front').innerHTML = card.q;
+            document.getElementById('card-back').innerHTML = card.a;
+
+            // Generate Curated Binary Options (A vs B)
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            let options = [
+                { text: card.a, isCorrect: true },
+                { text: card.wrong_a, isCorrect: false }
+            ];
+
+            shuffleArray(options);
+
+            options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = opt.text;
+                btn.dataset.correct = opt.isCorrect;
+                btn.onclick = () => handleSelection(btn, card.topic);
+                optionsContainer.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function handleSelection(clickedBtn, currentTopic) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timerInterval);
+
+            const isCorrect = clickedBtn.dataset.correct === "true";
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === "true") {
+                    btn.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                scores[currentTopic].correct++;
+            } else {
+                clickedBtn.classList.add('wrong');
+                scores[currentTopic].wrong++;
+            }
+
+            updateScoreboard(currentTopic);
+
+            document.getElementById('flip-btn').classList.add('show');
+            document.getElementById('next-btn').classList.add('show');
+        }
+
+        function handleTimeout() {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const card = currentDeck[currentCardIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === "true") {
+                    btn.classList.add('correct');
+                }
+            });
+
+            scores[card.topic].wrong++;
+            updateScoreboard(card.topic);
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerText = "Time's up! Next ➡️";
+
+            document.getElementById('flip-btn').classList.add('show');
+            document.getElementById('next-btn').classList.add('show');
+        }
+
+        function toggleFlip() {
+            document.getElementById('flashcard').classList.toggle('is-flipped');
+        }
+
+        function nextQuestion() {
+            currentCardIndex++;
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerText = "Next Question ➡️";
+            loadQuestion();
+        }
+
+        // Initialize Game
+        currentDeck = [...flashcards];
+        shuffleArray(currentDeck); // Randomize entire deck order on load
+        initScoreboard();
+        loadQuestion();
+
     </script>
 </body>
 
