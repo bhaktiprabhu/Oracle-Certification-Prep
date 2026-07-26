@@ -210,6 +210,8 @@
             { topic: "3. Functions & Aggregation", q: "How does COALESCE differ from NVL?", a: "NVL takes exactly two arguments.<br><br>COALESCE takes unlimited arguments and returns the FIRST non-null value." },
             { topic: "3. Functions & Aggregation", q: "What does NULLIF(a, b) return if the values match?", a: "It returns NULL! (If they differ, it returns 'a')." },
             { topic: "3. Functions & Aggregation", q: "Which group function does NOT ignore NULL values?", a: "<code>COUNT(*)</code> counts all rows, including NULLs." },
+            { topic: "3. Functions & Aggregation", q: "How does COUNT(column_name) handle NULLs?", a: "Unlike COUNT(*), COUNT(column_name) completely ignores NULL values. It only counts rows where that specific column has data." },
+            { topic: "3. Functions & Aggregation", q: "What do the AVG() and MAX() functions do?", a: "AVG() calculates the mathematical average of a numeric column. MAX() returns the highest value in a set (works on numbers, dates, and strings)." },
             { topic: "3. Functions & Aggregation", q: "What is the strict rule connecting SELECT and GROUP BY?", a: "If a column in your SELECT list is NOT inside an aggregate function, it MUST be listed in your GROUP BY clause." },
             { topic: "3. Functions & Aggregation", q: "What is the difference between WHERE and HAVING?", a: "WHERE filters rows BEFORE grouping.<br><br>HAVING filters groups AFTER aggregation." },
             { topic: "3. Functions & Aggregation", q: "What major GROUP BY upgrade was introduced in Oracle 23ai?", a: "You can now use column aliases inside the GROUP BY and HAVING clauses!" },
@@ -221,63 +223,72 @@
             { topic: "4. Joins", q: "Why will the query FROM employees SELF JOIN employees fail?", a: "SELF JOIN is not a real keyword! You must use standard JOIN and assign different table aliases." },
             { topic: "4. Joins", q: "Why can't you use the USING clause in a Non-Equijoin?", a: "Because there are no exactly matching column names. You MUST use the ON clause." },
             { topic: "4. Joins", q: "What causes a Cartesian Product?", a: "Accidentally omitting a join condition or WHERE clause, causing rows to multiply (Table A × Table B)." },
+            { topic: "4. Joins", q: "What is a NATURAL JOIN?", a: "An automatic join that links two tables using ALL columns that have the exact same name and compatible data types." },
+            { topic: "4. Joins", q: "What does a FULL OUTER JOIN do?", a: "Returns all matched rows, PLUS all unmatched rows from the left table, PLUS all unmatched rows from the right table." },
+            { topic: "4. Joins", q: "What happens in an INNER JOIN if no rows match the condition?", a: "It simply returns an empty result set (zero rows). It does not throw an error." },
 
             // Topic 5: Subqueries 
-            { f: "Subquery ORA-01427 Error", b: "Occurs when a single-row subquery using standard comparison operators (=, <, >) accidentally returns multiple rows." },
-            { f: "NOT IN and NULL Trap", b: "If a multiple-row subquery using NOT IN returns even a single NULL value, the outer query will return zero rows." },
-            { f: "= ANY Synonym", b: "The = ANY operator is mathematically identical to the IN operator." },
-            { f: "UPDATE SET Alias Trap", b: "Oracle strictly forbids prefixing the target column in the SET clause with a table alias (e.g., SET e.bonus = 100 will crash)." },
-            { f: "MERGE Statement", b: "A modern alternative to correlated subqueries for modifying data. It avoids row-by-row looping and allows aliases in the SET clause." },
-            { f: "Updatable Inline Views", b: "Oracle proprietary syntax that allows you to directly UPDATE the result of a SELECT statement joining two tables." },
+            { topic: "5. Subqueries", q: "What causes a Subquery ORA-01427 Error?", a: "Occurs when a single-row subquery using standard comparison operators (=, <, >) accidentally returns multiple rows." },
+            { topic: "5. Subqueries", q: "What is a Multiple-Column Subquery?", a: "A subquery that returns more than one column. It requires comparing multiple columns simultaneously in the outer query: <code>WHERE (col1, col2) IN (SELECT...)</code>" },
+            { topic: "5. Subqueries", q: "What is the NOT IN and NULL Trap?", a: "If a multiple-row subquery using NOT IN returns even a single NULL value, the outer query will return zero rows." },
+            { topic: "5. Subqueries", q: "What is the synonym for the = ANY operator?", a: "The <code>= ANY</code> operator is mathematically identical to the <code>IN</code> operator." },
+            { topic: "5. Subqueries", q: "What is the UPDATE SET Alias Trap?", a: "Oracle strictly forbids prefixing the target column in the SET clause with a table alias (e.g., <code>SET e.bonus = 100</code> will crash)." },
+            { topic: "5. Subqueries", q: "What is the MERGE Statement used for?", a: "A modern alternative to correlated subqueries for modifying data. It avoids row-by-row looping and allows aliases in the SET clause." },
+            { topic: "5. Subqueries", q: "What are Updatable Inline Views?", a: "Oracle proprietary syntax that allows you to directly UPDATE the result of a SELECT statement joining two tables." },
 
             // Topic 6: Set Operators
-            { f: "Set Operators Rule: Columns", b: "The number of columns and their data types must match exactly across all queries being combined." },
-            { f: "Set Operators Rule: Names", b: "The column names in the final output are strictly determined by the first SELECT statement." },
-            { f: "UNION vs UNION ALL", b: "UNION removes duplicates and implicitly sorts. UNION ALL retains duplicates, skips sorting, and is much faster." },
-            { f: "MINUS Operator Synonym", b: "MINUS is Oracle proprietary. The ANSI standard equivalent is EXCEPT." },
-            { f: "Dummy Columns", b: "Used to balance the column count in Set Operators. Example: SELECT name, age FROM A MINUS SELECT name, NULL FROM B." },
-            { f: "Set Operators ORDER BY Rule", b: "You can only use one ORDER BY clause, it must be at the very end of the statement, and it must reference the first query's columns." },
-            { f: "Implicit Sort Trap", b: "While UNION implicitly sorts data to remove duplicates, you must still use an explicit ORDER BY if the output strictly requires sorting." },
+            { topic: "6. Set Operators", q: "What is the rule for columns in Set Operators?", a: "The number of columns and their data types must match exactly across all queries being combined." },
+            { topic: "6. Set Operators", q: "How are output column names determined in Set Operators?", a: "The column names in the final output are strictly determined by the first SELECT statement." },
+            { topic: "6. Set Operators", q: "What is the difference between UNION and UNION ALL?", a: "UNION removes duplicates and implicitly sorts. UNION ALL retains duplicates, skips sorting, and is much faster." },
+            { topic: "6. Set Operators", q: "What is the difference between INTERSECT and INTERSECT ALL?", a: "INTERSECT returns only the unique rows that exist in BOTH result sets. 'INTERSECT ALL' is a trick exam answer—it does not exist in Oracle SQL!" },
+            { topic: "6. Set Operators", q: "How do Set Operators handle NULLs?", a: "Unlike standard WHERE clauses (where NULL = NULL is false), Set Operators treat two NULL values as mathematically EQUAL when comparing rows for duplicates or matches." },
+            { topic: "6. Set Operators", q: "What is the ANSI standard synonym for the MINUS operator?", a: "MINUS is Oracle proprietary. The ANSI standard equivalent is <code>EXCEPT</code>." },
+            { topic: "6. Set Operators", q: "What are Dummy Columns in Set Operators?", a: "Used to balance the column count in Set Operators. Example: <code>SELECT name, age FROM A MINUS SELECT name, NULL FROM B</code>." },
+            { topic: "6. Set Operators", q: "What is the ORDER BY rule in Set Operators?", a: "You can only use one ORDER BY clause, it must be at the very end of the statement, and it must reference the first query's columns." },
+            { topic: "6. Set Operators", q: "What is the Implicit Sort Trap?", a: "While UNION implicitly sorts data to remove duplicates, you must still use an explicit ORDER BY if the output strictly requires sorting." },
 
-            // Topic 7: DML statements
-            { f: "Explicit vs Implicit INSERT", b: "Explicit lists the columns (safest). Implicit skips the columns but strictly requires every value in the exact order of table creation." },
-            { f: "The DEFAULT Keyword", b: "In an INSERT statement, you can literally type the word DEFAULT in the VALUES list to trigger the column's default value." },
-            { f: "Implicit Commit Triggers", b: "Running any DDL (CREATE, ALTER, DROP) or DCL (GRANT, REVOKE) statement automatically and permanently commits any pending DML transactions." },
-            { f: "Read Consistency", b: "Before a COMMIT, only you can see your DML changes. Other users querying the database will see the original, unchanged data." },
-            { f: "UNIQUE vs NULL", b: "A UNIQUE constraint allows multiple NULL values because Oracle considers 'unknown' values to be mathematically distinct from each other." },
-            { f: "PRIMARY KEY Rule", b: "A Primary Key is the combination of NOT NULL + UNIQUE. A table can only have exactly ONE Primary Key." },
-            { f: "Constraint Naming Best Practice", b: "Always explicitly name constraints (e.g., emp_id_pk) so error messages are readable. Otherwise, Oracle auto-generates a meaningless SYS_C### name." },
+            // Topic 7: DML Statements
+            { topic: "7. DML Statements", q: "What is the difference between Explicit and Implicit INSERT?", a: "Explicit lists the columns (safest). Implicit skips the columns but strictly requires every value in the exact order of table creation." },
+            { topic: "7. DML Statements", q: "How do you use the DEFAULT keyword in INSERT?", a: "In an INSERT statement, you can literally type the word DEFAULT in the VALUES list to trigger the column's default value." },
+            { topic: "7. DML Statements", q: "What triggers an Implicit Commit?", a: "Running any DDL (CREATE, ALTER, DROP) or DCL (GRANT, REVOKE) statement automatically and permanently commits any pending DML transactions." },
+            { topic: "7. DML Statements", q: "What is Read Consistency in Oracle?", a: "Before a COMMIT, only you can see your DML changes. Other users querying the database will see the original, unchanged data." },
+            { topic: "7. DML Statements", q: "How does UNIQUE handle NULL values?", a: "A UNIQUE constraint allows multiple NULL values because Oracle considers 'unknown' values to be mathematically distinct from each other." },
+            { topic: "7. DML Statements", q: "What is the PRIMARY KEY rule?", a: "A Primary Key is the combination of NOT NULL + UNIQUE. A table can only have exactly ONE Primary Key." },
+            { topic: "7. DML Statements", q: "Why is constraint naming a best practice?", a: "Always explicitly name constraints (e.g., <code>emp_id_pk</code>) so error messages are readable. Otherwise, Oracle auto-generates a meaningless <code>SYS_C###</code> name." },
 
             // Topic 8: DDL
-            { f: "VARCHAR2 vs CHAR", b: "VARCHAR2 is variable-length and only uses the space needed. CHAR is fixed-length and pads empty space with invisible blanks." },
-            { f: "Data Type Size Rules", b: "VARCHAR2 strictly requires a size (e.g., VARCHAR2(50)). If you omit the size for CHAR, it defaults to CHAR(1)." },
-            { f: "The Namespace Rule", b: "Tables and Views share the same namespace in Oracle. You cannot have a table and a view with the exact same name." },
-            { f: "NOT NULL Constraint Rule", b: "The NOT NULL constraint is the only constraint that MUST be defined at the column level. It cannot be defined at the table level." },
-            { f: "Composite Key Rule", b: "If a PRIMARY KEY or UNIQUE constraint requires multiple columns, it MUST be defined using the table-level syntax at the bottom of the CREATE statement." },
-            { f: "View vs Sequence", b: "A View is a logical window based on a SELECT query (stores no data). A Sequence is an independent object that auto-generates unique numbers." },
-            { f: "DROP COLUMN vs SET UNUSED", b: "DROP physically removes data and is slow on large tables. SET UNUSED logically hides the column instantly, avoiding database locks." },
-            { f: "TRUNCATE TABLE Rules", b: "It is a DDL statement, meaning it cannot be rolled back (implicit commit). It deletes all rows instantly and releases physical storage space. No WHERE clause allowed." },
-            { f: "Global Temporary Tables (GTT)", b: "The structure is permanent and visible to all, but the data is private to the session. Defaults to ON COMMIT DELETE ROWS." },
-            { f: "ON COMMIT PRESERVE ROWS", b: "Used in GTTs to keep the private data alive through commits. The data is only wiped when the user's session ends." },
-            { f: "External Tables Restrictions", b: "They are strictly read-only. You cannot run DML (INSERT, UPDATE, DELETE) or create indexes on them." },
-            { f: "ORGANIZATION EXTERNAL", b: "The mandatory clause in a CREATE TABLE statement that maps the table to an operating system flat file using an access driver like ORACLE_LOADER." },
-            { f: "WITH CHECK OPTION", b: "A view constraint that prevents users from running UPDATE or INSERT statements that would cause the row to violate the view's WHERE clause." },
+            { topic: "8. DDL", q: "What is a Foreign Key?", a: "A column (or combination of columns) that establishes a relationship between two tables by referencing the Primary Key or Unique Key of another table." },
+            { topic: "8. DDL", q: "What does a CHECK Constraint do?", a: "Verifies that column values satisfy a specific condition (e.g., salary > 0) before allowing the database to execute an INSERT or UPDATE." },
+            { topic: "8. DDL", q: "What is the CLOB Data Type?", a: "Character Large Object. Used to store massive amounts of character data that exceed the standard 4,000-byte limit of VARCHAR2." },
+            { topic: "8. DDL", q: "What is the difference between VARCHAR2 and CHAR?", a: "VARCHAR2 is variable-length and only uses the space needed. CHAR is fixed-length and pads empty space with invisible blanks." },
+            { topic: "8. DDL", q: "What are the size rules for VARCHAR2 vs CHAR?", a: "VARCHAR2 strictly requires a size (e.g., VARCHAR2(50)). If you omit the size for CHAR, it defaults to CHAR(1)." },
+            { topic: "8. DDL", q: "What is the Namespace Rule in Oracle?", a: "Tables and Views share the same namespace in Oracle. You cannot have a table and a view with the exact same name." },
+            { topic: "8. DDL", q: "What is the NOT NULL constraint rule?", a: "The NOT NULL constraint is the only constraint that MUST be defined at the column level. It cannot be defined at the table level." },
+            { topic: "8. DDL", q: "How do you define a Composite Key constraint?", a: "If a PRIMARY KEY or UNIQUE constraint requires multiple columns, it MUST be defined using the table-level syntax at the bottom of the CREATE statement." },
+            { topic: "8. DDL", q: "What is the difference between a View and a Sequence?", a: "A View is a logical window based on a SELECT query (stores no data). A Sequence is an independent object that auto-generates unique numbers." },
+            { topic: "8. DDL", q: "What is the difference between DROP COLUMN and SET UNUSED?", a: "DROP physically removes data and is slow on large tables. SET UNUSED logically hides the column instantly, avoiding database locks." },
+            { topic: "8. DDL", q: "What are the rules for TRUNCATE TABLE?", a: "It is a DDL statement, meaning it cannot be rolled back (implicit commit). It deletes all rows instantly and releases physical storage space. No WHERE clause allowed." },
+            { topic: "8. DDL", q: "How do Global Temporary Tables (GTT) work?", a: "The structure is permanent and visible to all, but the data is private to the session. Defaults to ON COMMIT DELETE ROWS." },
+            { topic: "8. DDL", q: "What does ON COMMIT PRESERVE ROWS do?", a: "Used in GTTs to keep the private data alive through commits. The data is only wiped when the user's session ends." },
+            { topic: "8. DDL", q: "What are the restrictions on External Tables?", a: "They are strictly read-only. You cannot run DML (INSERT, UPDATE, DELETE) or create indexes on them." },
+            { topic: "8. DDL", q: "What is ORGANIZATION EXTERNAL?", a: "The mandatory clause in a CREATE TABLE statement that maps the table to an operating system flat file using an access driver like ORACLE_LOADER." },
+            { topic: "8. DDL", q: "What does WITH CHECK OPTION do on a view?", a: "A view constraint that prevents users from running UPDATE or INSERT statements that would cause the row to violate the view's WHERE clause." },
 
             // Topic 9: Managing Indexes, Synonyms, and Sequences
-            { f: "Synonym Purpose", b: "Provides an alternative name (alias) for a database object to simplify long names or hide the schema owner. It stores no data itself." },
-            { f: "Sequence CURRVAL Rule", b: "You MUST call NEXTVAL at least once in your current session before you are allowed to query CURRVAL, otherwise Oracle throws an error." },
-            { f: "Identity Column Strict Mode", b: "Defining a column as GENERATED ALWAYS AS IDENTITY forces the database to reject any manual inserts provided by a user for that column." },
+            { topic: "9. Indexes, Synonyms & Sequences", q: "What is the primary purpose of a Synonym?", a: "Provides an alternative name (alias) for a database object to simplify long names or hide the schema owner. It stores no data itself." },
+            { topic: "9. Indexes, Synonyms & Sequences", q: "What is the rule for Sequence CURRVAL?", a: "You MUST call NEXTVAL at least once in your current session before you are allowed to query CURRVAL, otherwise Oracle throws an error." },
+            { topic: "9. Indexes, Synonyms & Sequences", q: "What does Identity Column Strict Mode do?", a: "Defining a column as GENERATED ALWAYS AS IDENTITY forces the database to reject any manual inserts provided by a user for that column." },
 
             // Topic 10: Controlling User Access
-            { f: "System vs Object Privileges", b: "System privileges grant database-wide powers (e.g., CREATE TABLE). Object privileges grant rights to specific targets and strictly require the ON keyword (e.g., SELECT ON hr.employees)." },
-            { f: "WITH GRANT OPTION vs WITH ADMIN OPTION", b: "WITH GRANT OPTION is for Object privileges (revokes cascade). WITH ADMIN OPTION is for System privileges (revokes do NOT cascade)." },
-            { f: "Roles 3-Step Process", b: "1) Create the role. 2) Grant system or object privileges to the role. 3) Grant the role to the users." },
+            { topic: "10. Controlling User Access", q: "What is the difference between System and Object privileges?", a: "System privileges grant database-wide powers (e.g., CREATE TABLE). Object privileges grant rights to specific targets and strictly require the ON keyword (e.g., SELECT ON hr.employees)." },
+            { topic: "10. Controlling User Access", q: "What is the difference between WITH GRANT OPTION and WITH ADMIN OPTION?", a: "WITH GRANT OPTION is for Object privileges (revokes cascade). WITH ADMIN OPTION is for System privileges (revokes do NOT cascade)." },
+            { topic: "10. Controlling User Access", q: "What is the 3-Step Process for Roles?", a: "1) Create the role. 2) Grant system or object privileges to the role. 3) Grant the role to the users." },
 
             // Topic 11: Data Dictionary & Time Zones
-            { f: "Data Dictionary Prefixes", b: "USER_ = Objects you own. ALL_ = Objects you have access to. DBA_ = Every object in the database (requires DBA privileges)." },
-            { f: "Time Zone: Session vs Server", b: "Functions prefixed with CURRENT_ or LOCAL return the session's time. Functions prefixed with SYS (like SYSDATE) return the database server's OS time." },
-            { f: "CURRENT_TIMESTAMP", b: "The specific time zone function that returns the session's date, fractional seconds, AND the explicit time zone offset (e.g., +02:00)." },
-            { f: "INTERVAL Data Types", b: "The two specific types used for date arithmetic are INTERVAL YEAR TO MONTH (e.g., '2-6') and INTERVAL DAY TO SECOND (e.g., '4 12:30:00')." }
+            { topic: "11. Data Dictionary & Time Zones", q: "What do the Data Dictionary prefixes (USER_, ALL_, DBA_) mean?", a: "USER_ = Objects you own. ALL_ = Objects you have access to. DBA_ = Every object in the database (requires DBA privileges)." },
+            { topic: "11. Data Dictionary & Time Zones", q: "What is the difference between Session and Server time zone functions?", a: "Functions prefixed with CURRENT_ or LOCAL return the session's time. Functions prefixed with SYS (like SYSDATE) return the database server's OS time." },
+            { topic: "11. Data Dictionary & Time Zones", q: "What does CURRENT_TIMESTAMP return?", a: "The specific time zone function that returns the session's date, fractional seconds, AND the explicit time zone offset (e.g., +02:00)." },
+            { topic: "11. Data Dictionary & Time Zones", q: "What are the two INTERVAL Data Types?", a: "The two specific types used for date arithmetic are INTERVAL YEAR TO MONTH (e.g., '2-6') and INTERVAL DAY TO SECOND (e.g., '4 12:30:00')." }
         ];
 
         let currentIndex = 0;
@@ -288,17 +299,15 @@
         const progressEl = document.getElementById('progress-display');
 
         function updateCard() {
-            // Remove flip class to ensure we see the front when changing cards
             cardEl.classList.remove('is-flipped');
 
-            // Small delay to let the card flip back before changing text
             setTimeout(() => {
                 const currentCard = flashcards[currentIndex];
                 frontEl.innerHTML = currentCard.q;
                 backEl.innerHTML = currentCard.a;
                 topicEl.innerHTML = `📂 ${currentCard.topic}`;
                 progressEl.innerHTML = `📝 ${currentIndex + 1} / ${flashcards.length}`;
-            }, 150); // Matches the start of the CSS transition
+            }, 150);
         }
 
         function flipCard() {
@@ -315,7 +324,7 @@
             updateCard();
         }
 
-        // Initialize the deck on load
+        // Initialize on load
         updateCard();
     </script>
 </body>
