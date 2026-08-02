@@ -70,6 +70,34 @@ const flashcards = [
         "explanation": "When using substitution variables, <code>SET VERIFY ON</code> provides debugging output in the console. It shows you the exact SQL statement <i>before</i> substitution and <i>after</i> substitution so you can verify the variable was inserted correctly."
     },
     {
+        "topic": "2. Retrieval & Sorting",
+        "q": "What does the FETCH FIRST ... WITH TIES clause do?",
+        "a": "Returns the exact row limit, PLUS any extra rows that share the same sort value as the final row.",
+        "wrong_a": "Returns the exact row limit, but sorts any duplicate values to the very top of the result set.",
+        "explanation": "To use <code>WITH TIES</code>, you <b>MUST</b> include an <code>ORDER BY</code> clause. If you ask for the Top 3 highest salaries, and the 3rd and 4th employee make the exact same amount, Oracle will return 4 rows instead of cutting off the tie.<br><pre>SELECT last_name, salary FROM emp ORDER BY salary DESC FETCH FIRST 3 ROWS WITH TIES;</pre>"
+    },
+    {
+        "topic": "2. Retrieval & Sorting",
+        "q": "What is the purpose of the OFFSET clause?",
+        "a": "It skips a specified number of rows before beginning to return the result set.",
+        "wrong_a": "It shifts the starting point of a date or timestamp to a different timezone.",
+        "explanation": "OFFSET is primarily used for pagination (e.g., skipping the first 10 results to view 'Page 2'). It should always be paired with an <code>ORDER BY</code> clause so you aren't skipping random rows.<br><pre>SELECT last_name FROM emp ORDER BY salary DESC OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;</pre>"
+    },
+    {
+        "topic": "2. Retrieval & Sorting",
+        "q": "In the Row Limiting clause, can you use FETCH FIRST after an OFFSET?",
+        "a": "Yes! The keywords <code>FIRST</code> and <code>NEXT</code> are exact synonyms and are completely interchangeable.",
+        "wrong_a": "No. If you use OFFSET, you are strictly required to use the <code>NEXT</code> keyword.",
+        "explanation": "Oracle provides synonyms purely for English readability. <code>OFFSET 5 ROWS FETCH FIRST 10 ROWS</code> sounds weird in English, but it is 100% valid SQL. The keywords <code>ROW</code> and <code>ROWS</code> are also completely interchangeable."
+    },
+    {
+        "topic": "2. Retrieval & Sorting",
+        "q": "Can you use the keyword LAST to fetch the bottom rows? (e.g., FETCH LAST 10 ROWS)",
+        "a": "No! The <code>LAST</code> keyword does not exist in the Row Limiting Clause.",
+        "wrong_a": "Yes, <code>FETCH LAST</code> is the exact mathematical opposite of <code>FETCH FIRST</code>.",
+        "explanation": "To get the bottom records, you must reverse your <code>ORDER BY</code> logic (e.g., sort ASC instead of DESC) and still use <code>FETCH FIRST</code> or <code>FETCH NEXT</code>."
+    },
+    {
         "topic": "3. Functions & Aggregation",
         "q": "What does TRUNC(SYSDATE, 'YEAR') return?",
         "a": "January 1st of the current year.",
